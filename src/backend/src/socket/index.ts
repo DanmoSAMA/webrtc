@@ -39,6 +39,7 @@ export default function setupSocket(server: any) {
     if (isTokenValid(token)) {
       const uid = decodeToken(token);
       uidSet.add(uid);
+      io.emit('login received');
     }
 
     onLogin(io, socket);
