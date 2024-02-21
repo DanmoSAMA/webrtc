@@ -53,27 +53,68 @@ function _Header() {
               {ChatStore.currentChat?.count} members
             </span>
           )}
-          {/* {ChatStore.currentChat?.uid && (
-            <span className='c-header-right-info-state'>online</span>
-          )} */}
         </div>
-        <SvgIcon
-          name='search'
-          style={{
-            color: 'var(--global-font-primary_lighter)',
-            width: '35px',
-            height: '35px',
-            position: 'absolute',
-            right: '70px',
-            cursor: ChatStore.currentChat !== null ? 'pointer' : 'default',
-          }}
-          onClick={(e) => {
-            if (ChatStore.currentChat !== null) {
-              e.stopPropagation();
-              setShowQueryDropdown(!showQueryDropdown);
-            }
-          }}
-        />
+        {ChatStore.currentChat && (
+          <SvgIcon
+            name='phone'
+            style={{
+              color: 'var(--global-font-primary_lighter)',
+              width: '33px',
+              height: '33px',
+              position: 'absolute',
+              right: '280px',
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {}}
+          />
+        )}
+        {ChatStore.currentChat && (
+          <SvgIcon
+            name='video'
+            style={{
+              color: 'var(--global-font-primary_lighter)',
+              width: '30px',
+              height: '30px',
+              position: 'absolute',
+              right: '210px',
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {}}
+          />
+        )}
+        {ChatStore.currentChat && (
+          <SvgIcon
+            name='remoteControl'
+            style={{
+              color: 'var(--global-font-primary_lighter)',
+              width: '30px',
+              height: '30px',
+              position: 'absolute',
+              right: '140px',
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {}}
+          />
+        )}
+        {ChatStore.currentChat && (
+          <SvgIcon
+            name='search'
+            style={{
+              color: 'var(--global-font-primary_lighter)',
+              width: '35px',
+              height: '35px',
+              position: 'absolute',
+              right: '70px',
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              if (ChatStore.currentChat !== null) {
+                e.stopPropagation();
+                setShowQueryDropdown(!showQueryDropdown);
+              }
+            }}
+          />
+        )}
         <SvgIcon
           name='right-menu'
           style={{

@@ -36,11 +36,13 @@ function _QueryDropdown({ showDropdown }: QueryDropdownProps) {
               src={ChatStore.currentChat?.avatarUrl ?? DefaultAvatarUrl}
             />
           </div>
-          <div className='c-header-query-dropdown-title'>
-            账号：{ChatStore.currentChat?.uid}
-          </div>
-          <div className='c-header-query-dropdown-title'>
-            昵称：{ChatStore.currentChat?.name}
+          <div style={{ padding: '0 20px' }}>
+            <div className='c-header-query-dropdown-title'>
+              账号：{ChatStore.currentChat?.uid}
+            </div>
+            <div className='c-header-query-dropdown-title'>
+              昵称：{ChatStore.currentChat?.name}
+            </div>
           </div>
         </>
       )}
