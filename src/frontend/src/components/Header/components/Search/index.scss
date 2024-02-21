@@ -1,0 +1,18 @@
+.c-header-search {
+  flex: 1 0 auto;
+
+  &-input {
+    box-sizing: border-box;
+    width: 90%;
+    height: 40px;
+    background: #fff;
+    margin-left: 5%;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    background: var(--global-bg-primary_lighter);
+    padding-left: 10px;
+    color: var(--global-font-primary);
+    font-size: 18px;
+  }
+}

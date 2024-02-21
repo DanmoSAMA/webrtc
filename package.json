@@ -1,0 +1,12 @@
+{
+  "name": "webrtc",
+  "version": "1.0.0",
+  "description": "一个模仿 Telegram 的网络聊天平台，可支持在线聊天和离线消息接收。",
+  "main": "index.js",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

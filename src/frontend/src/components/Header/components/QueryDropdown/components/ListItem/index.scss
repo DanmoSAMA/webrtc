@@ -1,0 +1,47 @@
+.c-header-query-dropdown-list-item {
+  height: 40px;
+  min-height: 40px;
+  align-items: center;
+  margin: 5px 0;
+  padding: 0 10px;
+
+  &-avatar {
+    margin-right: 15px;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  &-main {
+    flex: 1 0;
+    display: flex;
+    align-items: center;
+
+    &-name {
+      height: 25px;
+      line-height: 25px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-online {
+      height: 25px;
+      line-height: 25px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      color: skyblue;
+      margin-left: 10px;
+    }
+
+    &-btn {
+      font-size: 13px;
+      margin-left: 20px;
+      cursor: pointer;
+    }
+  }
+}

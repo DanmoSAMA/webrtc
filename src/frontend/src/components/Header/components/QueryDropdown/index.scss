@@ -1,0 +1,30 @@
+.c-header-query-dropdown {
+  position: absolute;
+  z-index: 10;
+  width: 50%;
+  height: calc(100vh - 160px);
+  box-sizing: border-box;
+  padding: 20px;
+  right: -20px;
+  top: 80px;
+  display: flex;
+  background: var(--global-bg-primary);
+  flex-direction: column;
+  overflow: auto;
+
+  &-title {
+    font-size: 18px;
+    margin: 20px 0;
+  }
+
+  &-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &-img {
+      border-radius: 5px;
+      width: 90%;
+    }
+  }
+}
