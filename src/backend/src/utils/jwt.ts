@@ -23,11 +23,6 @@ export function isTokenValid(token: string) {
   }
   try {
     jwt.verify(token, SECRET_KEY); // verify 已经检查过 token 是否过期
-
-    // if (decodedToken.exp < Date.now() / 1000) {
-    //   return false;
-    // }
-
     return true;
   } catch {
     return false;

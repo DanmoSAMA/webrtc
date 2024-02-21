@@ -8,7 +8,6 @@ import { ChatType } from '@/enums';
 import { IGroup, IMessage, IUser } from '@/types';
 import { getGroupList } from '@/network/group/getGroupList';
 import { getFriendList } from '@/network/friend/getFriendList';
-import { pullMsgOutline } from '@/network/message/pullMsgOutline';
 
 class ChatListState {
   public chatType: ChatType = ChatType.Message;
@@ -55,19 +54,6 @@ class ChatListState {
 
   public setFriendData(friends: any[]) {
     this.friendData = friends;
-  }
-
-  /**
-   * 请求消息纲要
-   * @param val 要设置的值
-   * @returns void
-   */
-  public updateMsgOutline() {
-    const mid = 0;
-    pullMsgOutline({ lastMessageId: mid }).then(({ data }) => {
-      const { message } = data;
-      this.msgData = message;
-    });
   }
 }
 
