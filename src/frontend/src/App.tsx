@@ -7,6 +7,7 @@ import { BackendHost } from '@/consts';
 import { getToken } from '@/utils/token';
 import { getUserInfo } from '@/network/user/getUserInfo';
 import { getPathname } from './utils/url';
+import { handleReceiverSide } from './webrtc/receiver';
 import io, { Socket } from 'socket.io-client';
 import Emitter from '@/utils/eventEmitter';
 import MsgStore from '@/mobx/msg';
@@ -14,8 +15,6 @@ import AlertMUITemplate from 'react-alert-template-mui';
 import UserStore from '@/mobx/user';
 import MultiMediaStore from '@/mobx/multiMedia';
 import './App.scss';
-import ChatStore from '@/mobx/chat';
-import { handleReceiverSide } from '@/utils/webrtc';
 
 configure({
   enforceActions: 'never',

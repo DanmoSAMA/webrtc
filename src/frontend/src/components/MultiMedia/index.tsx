@@ -5,13 +5,17 @@
 
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { handleReceiverSide, handleSenderSide } from '@/utils/webrtc';
+import { handleSenderSide, pc } from '../../webrtc/sender';
+import { socket } from '@/App';
+import { stopConnection } from '../../webrtc/utils';
+import { useAlert } from 'react-alert';
 import Switch from '../Header/components/LeftDropdown/components/Switch';
 import MultiMediaStore from '@/mobx/multiMedia';
-import ChatStore from '@/mobx/chat';
 import './index.scss';
 
 function _MultiMedia() {
+  const alert = useAlert();
+
   useEffect(() => {
     if (MultiMediaStore.isSender) {
       handleSenderSide();
@@ -19,6 +23,14 @@ function _MultiMedia() {
       // handleReceiverSide(MultiMediaStore.sender?.uid);
     }
   }, []); // MultiMediaStore.isAudioOpen, MultiMediaStore.isVideoOpen
+
+  useEffect(() => {
+    socket.on('terminate call received', () => {
+      stopConnection(pc, false);
+
+      alert.show('对方已结束通话');
+    });
+  });
 
   return (
     <div className='c-multimedia'>
@@ -67,8 +79,7 @@ function _MultiMedia() {
         <div
           className='c-multimedia-operation-stop'
           onClick={() => {
-            // TODO
-            ChatStore.setIsMultiMedia(false);
+            stopConnection(pc);
           }}
         >
           终止通话

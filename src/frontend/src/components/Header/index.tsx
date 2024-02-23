@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useShowDropDown } from './hooks/useShowDropdown';
 import { useAlert } from 'react-alert';
+import { call } from '@/network/webrtc/call';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Search from './components/Search';
@@ -10,8 +11,6 @@ import RightDropdown from './components/RightDropdown';
 import QueryDropdown from './components/QueryDropdown';
 import MultiMediaStore from '@/mobx/multiMedia';
 import './index.scss';
-import { call } from '@/network/webrtc/call';
-import { handleSenderSide } from '@/utils/webrtc';
 
 function _Header() {
   const alert = useAlert();

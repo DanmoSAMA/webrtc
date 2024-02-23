@@ -42,7 +42,7 @@
       "@/plugins/*": ["src/plugins/*"],
       "@/types/*": ["src/types"],
       "@/enums/*": ["src/enums"],
-      "@/ws/*": ["src/ws"]
+      "@/webrtc/*": ["src/webrtc"]
     }
   },
   "include": ["src", "tests"],
