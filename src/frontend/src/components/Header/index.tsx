@@ -1,15 +1,20 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useShowDropDown } from './hooks/useShowDropdown';
+import { useAlert } from 'react-alert';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Search from './components/Search';
 import LeftDropdown from './components/LeftDropdown';
 import RightDropdown from './components/RightDropdown';
-import './index.scss';
 import QueryDropdown from './components/QueryDropdown';
+import MultiMediaStore from '@/mobx/multiMedia';
+import './index.scss';
+import { call } from '@/network/webrtc/call';
+import { handleSenderSide } from '@/utils/webrtc';
 
 function _Header() {
+  const alert = useAlert();
   const [showLeftDropdown, setShowLeftDropdown] = useState(false);
   const {
     showDropDown: showRightDropDown,
@@ -65,7 +70,27 @@ function _Header() {
               right: '280px',
               cursor: 'pointer',
             }}
-            onClick={(e) => {}}
+            onClick={() => {
+              // if (ChatStore.currentChat?.uid) {
+              //   if (ChatStore.currentChat?.online) {
+              //     ChatStore.setIsMultiMedia(true);
+              //     MultiMediaStore.setAudioOpenState(true);
+              //     MultiMediaStore.setVideoOpenState(false);
+
+              //     call({ uid: ChatStore.currentChat?.uid });
+              //   } else {
+              //     alert.show('对方处于离线状态，请稍后再试', {
+              //       title: '操作失败 ',
+              //     });
+              //   }
+              // }
+
+              ChatStore.setIsMultiMedia(true);
+              MultiMediaStore.setAudioOpenState(true);
+              MultiMediaStore.setVideoOpenState(false);
+
+              call({ uid: ChatStore.currentChat?.uid });
+            }}
           />
         )}
         {ChatStore.currentChat && (
@@ -79,7 +104,27 @@ function _Header() {
               right: '210px',
               cursor: 'pointer',
             }}
-            onClick={(e) => {}}
+            onClick={() => {
+              // if (ChatStore.currentChat?.uid) {
+              //   if (ChatStore.currentChat?.online) {
+              //     ChatStore.setIsMultiMedia(true);
+              //     MultiMediaStore.setAudioOpenState(true);
+              //     MultiMediaStore.setVideoOpenState(true);
+
+              //     call({ uid: ChatStore.currentChat?.uid });
+              //   } else {
+              //     alert.show('对方处于离线状态，请稍后再试', {
+              //       title: '操作失败 ',
+              //     });
+              //   }
+              // }
+
+              ChatStore.setIsMultiMedia(true);
+              MultiMediaStore.setAudioOpenState(true);
+              MultiMediaStore.setVideoOpenState(true);
+
+              call({ uid: ChatStore.currentChat?.uid });
+            }}
           />
         )}
         {ChatStore.currentChat && (
@@ -93,7 +138,7 @@ function _Header() {
               right: '140px',
               cursor: 'pointer',
             }}
-            onClick={(e) => {}}
+            // onClick={(e) => {}}
           />
         )}
         {ChatStore.currentChat && (
@@ -115,27 +160,30 @@ function _Header() {
             }}
           />
         )}
-        <SvgIcon
-          name='right-menu'
-          style={{
-            color: 'var(--global-font-primary_lighter)',
-            width: '35px',
-            height: '35px',
-            position: 'absolute',
-            right: '20px',
-            cursor: ChatStore.currentChat !== null ? 'pointer' : 'default',
+        {ChatStore.currentChat && (
+          <SvgIcon
+            name='right-menu'
+            style={{
+              color: 'var(--global-font-primary_lighter)',
+              width: '35px',
+              height: '35px',
+              position: 'absolute',
+              right: '20px',
+              cursor: 'pointer',
 
-            '&:hover': {
-              color: 'var(--global-font-primary)',
-            },
-          }}
-          onClick={(e) => {
-            if (ChatStore.currentChat !== null) {
-              e.stopPropagation();
-              setShowRightDropDown(true);
-            }
-          }}
-        />
+              '&:hover': {
+                color: 'var(--global-font-primary)',
+              },
+            }}
+            onClick={(e) => {
+              if (ChatStore.currentChat !== null) {
+                e.stopPropagation();
+                setShowRightDropDown(true);
+              }
+            }}
+          />
+        )}
+
         <QueryDropdown showDropdown={showQueryDropdown} />
         <RightDropdown showDropdown={showRightDropDown} />
       </div>

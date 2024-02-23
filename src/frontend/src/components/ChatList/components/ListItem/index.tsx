@@ -2,33 +2,11 @@ import { observer } from 'mobx-react-lite';
 import { IChat } from '@/types';
 import { MessageType, ChatType } from '@/enums';
 import { getIdentity } from '@/network/group/getIdentity';
+import { useAlert } from 'react-alert';
 import ChatStore from '@/mobx/chat';
 import AuthorityStore from '@/mobx/authority';
 import GroupStore from '@/mobx/group';
 import './index.scss';
-
-async function handleClick({
-  uid,
-  gid,
-  avatarUrl,
-  name,
-  online,
-}: Partial<IChat>) {
-  ChatStore.setCurrentChat({
-    uid,
-    gid,
-    avatarUrl,
-    name,
-    online,
-  });
-
-  if (gid) {
-    const { data } = await getIdentity({ gid }); // 拉取权限
-    AuthorityStore.setIdentity(data.identity);
-
-    await GroupStore.init(gid);
-  }
-}
 
 function _ListItem({
   uid,
@@ -39,6 +17,38 @@ function _ListItem({
   chatType,
   online,
 }: Partial<IChat> & { chatType: ChatType }) {
+  const alert = useAlert();
+
+  async function handleClick({
+    uid,
+    gid,
+    avatarUrl,
+    name,
+    online,
+  }: Partial<IChat>) {
+    if (ChatStore.isMultiMedia) {
+      alert.show('请先退出，再进行操作', {
+        title: '您正处于语音通话或远程控制中 ',
+      });
+      return;
+    }
+
+    ChatStore.setCurrentChat({
+      uid,
+      gid,
+      avatarUrl,
+      name,
+      online,
+    });
+
+    if (gid) {
+      const { data } = await getIdentity({ gid }); // 拉取权限
+      AuthorityStore.setIdentity(data.identity);
+
+      await GroupStore.init(gid);
+    }
+  }
+
   return (
     <div
       className='c-chat_list-item'

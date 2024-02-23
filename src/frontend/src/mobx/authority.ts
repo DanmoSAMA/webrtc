@@ -23,11 +23,21 @@ class AuthorityState {
     this.identity = val;
   }
 
+  /**
+   * 判断是否为管理员
+   * @param gid 群号
+   * @returns boolean
+   */
   public async isAdministrator(gid: any) {
     const { data } = await getIdentity({ gid });
     return data.identity === AuthorityLevel.Administrator;
   }
 
+  /**
+   * 判断是否为群主
+   * @param gid 群号
+   * @returns boolean
+   */
   public async isOwner(gid: any) {
     const { data } = await getIdentity({ gid });
     return data.identity === AuthorityLevel.Owner;

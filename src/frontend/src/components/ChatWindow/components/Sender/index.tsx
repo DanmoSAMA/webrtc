@@ -3,12 +3,12 @@ import { useAlert } from 'react-alert';
 import { sendMsg } from '@/network/message/sendMsg';
 import { MessageType } from '@/enums';
 import { HttpCode } from '../../../../../../shared/consts/httpCode';
+import { isSingleChat } from '@/utils/chat';
+import { sendGroupMsg } from '@/network/message/sendGroupMsg';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Emitter from '@/utils/eventEmitter';
 import './index.scss';
-import { isSingleChat } from '@/utils/chat';
-import { sendGroupMsg } from '@/network/message/sendGroupMsg';
 
 interface ISendMsg {
   content: string;

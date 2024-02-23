@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 import { compilerOptions } from './tsconfig.json';
 import { svgBuilder } from './src/plugins/svgBuilder';
-import { BackendHost, WsHost } from './src/consts';
+import { BackendHost } from './src/consts';
+import mkcert from 'vite-plugin-mkcert';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -10,6 +11,7 @@ export default defineConfig({
       jsxImportSource: '@emotion/react',
     }),
     svgBuilder('./assets/icons/'),
+    mkcert({ source: 'coding' }),
   ],
   resolve: {
     alias: Object.fromEntries(
@@ -26,12 +28,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
-      '/ws': {
-        target: `${WsHost}`,
-        ws: true,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ws/, ''),
-      },
     },
+    https: true,
   },
 });

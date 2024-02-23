@@ -8,6 +8,7 @@ import { IChat } from '@/types';
 
 class ChatState {
   public currentChat: Partial<IChat> | null = null;
+  public isMultiMedia = false;
 
   public constructor() {
     makeAutoObservable(this);
@@ -20,6 +21,15 @@ class ChatState {
    */
   public setCurrentChat(val: Partial<IChat> | null) {
     this.currentChat = val;
+  }
+
+  /**
+   * 设置是否使用多媒体
+   * @param val 要设置的值
+   * @returns void
+   */
+  public setIsMultiMedia(val: boolean) {
+    this.isMultiMedia = val;
   }
 
   /**

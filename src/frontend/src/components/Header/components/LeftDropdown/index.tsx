@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { CSSObject } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
-import { ToggleType } from '@/enums';
+import { Theme, ToggleType } from '@/enums';
 import { MessageStatus } from '../../../../../../shared/enums/index';
 import { logout } from '@/network/user/logout';
 import MsgStore from '@/mobx/msg';
@@ -9,6 +9,7 @@ import UserStore from '@/mobx/user';
 import ToggleStore from '@/mobx/toggle';
 import SvgIcon from '@/components/SvgIcon';
 import Switch from './components/Switch';
+import ThemeStore from '@/mobx/theme';
 import './index.scss';
 
 interface LeftDropdownProps {
@@ -105,7 +106,13 @@ function _LeftDropdown({
       <li className='c-header-left-dropdown-item' id='dark_mode'>
         <SvgIcon name='moon' style={iconStyle} />
         暗黑模式
-        <Switch />
+        <Switch
+          checked={ThemeStore.theme === Theme.Dark}
+          onChange={(e) => {
+            const value = e.target.checked;
+            ThemeStore.setTheme(value ? Theme.Dark : Theme.Light);
+          }}
+        />
       </li>
       <li className='c-header-left-dropdown-item' onClick={logout}>
         <SvgIcon name='myself' style={iconStyle} />

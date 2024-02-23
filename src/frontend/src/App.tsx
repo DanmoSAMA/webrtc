@@ -6,12 +6,16 @@ import { router } from '@/routes';
 import { BackendHost } from '@/consts';
 import { getToken } from '@/utils/token';
 import { getUserInfo } from '@/network/user/getUserInfo';
+import { getPathname } from './utils/url';
 import io, { Socket } from 'socket.io-client';
 import Emitter from '@/utils/eventEmitter';
 import MsgStore from '@/mobx/msg';
 import AlertMUITemplate from 'react-alert-template-mui';
 import UserStore from '@/mobx/user';
+import MultiMediaStore from '@/mobx/multiMedia';
 import './App.scss';
+import ChatStore from '@/mobx/chat';
+import { handleReceiverSide } from '@/utils/webrtc';
 
 configure({
   enforceActions: 'never',
@@ -43,16 +47,6 @@ function App() {
     UserStore.setUserInfo({ uid, name, avatarUrl });
   }
 
-  // useEffect(() => {
-  //   socket.on('connect', () => {
-  //     console.log('socket: 已与服务端建立连接');
-  //   });
-
-  //   socket.on('disconnect', () => {
-  //     console.log('socket: 与服务端的连接已断开');
-  //   });
-  // }, []);
-
   useEffect(() => {
     Emitter.on('scrollToBottom', scrollToBottom);
     return () => {
@@ -66,6 +60,22 @@ function App() {
       socket.emit('logout request', { token: getToken() }, () => {
         console.log('已离线');
       });
+    });
+  }, []);
+
+  useEffect(() => {
+    const pathname = getPathname(window.location.href);
+
+    socket.on('call received', (sender) => {
+      handleReceiverSide(sender.uid);
+
+      if (pathname !== 'login' && pathname !== 'register') {
+        const checked = confirm(`收到用户 ${sender.name} 的语音通话请求`);
+
+        if (checked) {
+          MultiMediaStore.initMultiMedia(false, sender);
+        }
+      }
     });
   }, []);
 

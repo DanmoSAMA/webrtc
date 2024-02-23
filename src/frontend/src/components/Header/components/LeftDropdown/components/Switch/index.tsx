@@ -1,20 +1,22 @@
 import { observer } from 'mobx-react-lite';
-import { Theme } from '@/enums';
-import ThemeStore from '@/mobx/theme';
 import './index.scss';
 
-function _Switch() {
+interface SwitchProps {
+  checked: boolean;
+  onChange: (e: any) => any;
+  style?: any;
+}
+
+function _Switch(props: SwitchProps) {
+  const { checked, onChange, style } = props;
   return (
-    <div className='switch_wrapper'>
+    <div className='switch_wrapper' style={style}>
       <label className='switch_wrapper-switch'>
         <input
           className='switch_wrapper-switch-input'
-          checked={ThemeStore.theme === Theme.Dark ? true : false}
+          checked={checked}
           type='checkbox'
-          onChange={(e) => {
-            const value = e.target.checked;
-            ThemeStore.setTheme(value ? Theme.Dark : Theme.Light);
-          }}
+          onChange={onChange}
         />
         <span className='switch_wrapper-switch-slider' />
       </label>

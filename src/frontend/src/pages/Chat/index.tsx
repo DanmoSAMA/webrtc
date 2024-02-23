@@ -9,6 +9,8 @@ import UserInfo from '@/components/UserInfo';
 import Toggle from '@/components/Toggle';
 import ThemeStore from '@/mobx/theme';
 import ChatListStore from '@/mobx/chatlist';
+import ChatStore from '@/mobx/chat';
+import MultiMedia from '@/components/MultiMedia';
 import './index.scss';
 
 function _Chat() {
@@ -30,7 +32,8 @@ function _Chat() {
       <Header />
       <div className='chat-main'>
         <ChatList />
-        <ChatWindow />
+        {!ChatStore.isMultiMedia && <ChatWindow />}
+        {ChatStore.isMultiMedia && <MultiMedia />}
         <UserInfo />
       </div>
       <Toggle />
