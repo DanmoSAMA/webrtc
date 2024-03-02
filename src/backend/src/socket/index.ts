@@ -25,6 +25,8 @@ import { onSdpAnswer } from './webrtc/sdpAnswer';
 import { onIceCandidate } from './webrtc/iceCandidate';
 import { onCall } from './webrtc/call';
 import { onTerminateCall } from './webrtc/terminateCall';
+import { onRejectCall } from './webrtc/rejectCall';
+import { onSwitchToSender } from './webrtc/switchToSender';
 
 export const uidSet = new Set(); // 保存在线用户 uid 的集合
 
@@ -88,5 +90,9 @@ export default function setupSocket(server: any) {
     onIceCandidate(io, socket);
 
     onTerminateCall(io, socket);
+
+    onRejectCall(io, socket);
+
+    onSwitchToSender(io, socket);
   });
 }

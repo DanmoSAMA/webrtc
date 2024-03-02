@@ -4,12 +4,12 @@
  */
 
 import { makeAutoObservable } from 'mobx';
-import ChatStore from './chat';
 import { IUser } from '@/types';
+import ChatStore from './chat';
 
 class MultiMediaState {
-  public isAudioOpen = false;
-  public isVideoOpen = false;
+  public isAudioOpen = true;
+  public isVideoOpen = true;
   public isSender = true;
   public sender: IUser | null = null;
 
@@ -36,11 +36,34 @@ class MultiMediaState {
   }
 
   /**
+   * 设置是否为发送方
+   * @param val 要设置的值
+   * @returns void
+   */
+  public setIsSender(val: boolean) {
+    this.isSender = val;
+  }
+
+  /**
+   * 设置发送方信息
+   * @param val 要设置的值
+   * @returns void
+   */
+  public setSender(val: IUser) {
+    this.sender = val;
+  }
+
+  /**
    * 初始化
    * @param val 要设置的值
    * @returns void
    */
-  public initMultiMedia(isSender: boolean, sender?: IUser) {
+  public initMultiMedia(
+    isSender: boolean,
+    sender?: IUser,
+    isAudioOpen?: boolean,
+    isVideoOpen?: boolean,
+  ) {
     if (!isSender && sender) {
       ChatStore.setCurrentChat({
         uid: sender.uid,
@@ -54,8 +77,8 @@ class MultiMediaState {
 
     ChatStore.isMultiMedia = true;
 
-    this.isAudioOpen = true;
-    this.isVideoOpen = false;
+    this.isAudioOpen = isAudioOpen ?? true;
+    this.isVideoOpen = isVideoOpen ?? true;
     this.isSender = isSender;
   }
 }

@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useShowDropDown } from './hooks/useShowDropdown';
-import { useAlert } from 'react-alert';
 import { call } from '@/network/webrtc/call';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
@@ -13,7 +12,6 @@ import MultiMediaStore from '@/mobx/multiMedia';
 import './index.scss';
 
 function _Header() {
-  const alert = useAlert();
   const [showLeftDropdown, setShowLeftDropdown] = useState(false);
   const {
     showDropDown: showRightDropDown,

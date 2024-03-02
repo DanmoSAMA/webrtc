@@ -9,10 +9,17 @@ export function handleSenderSide() {
 
   navigator.mediaDevices
     .getUserMedia({
-      video: MultiMediaStore.isVideoOpen,
-      audio: MultiMediaStore.isAudioOpen,
+      video: true,
+      audio: true,
     })
     .then((stream) => {
+      if (!MultiMediaStore.isAudioOpen) {
+        stream.getAudioTracks().forEach((track) => track.stop());
+      }
+      if (!MultiMediaStore.isVideoOpen) {
+        stream.getVideoTracks().forEach((track) => track.stop());
+      }
+
       console.log('sender: add track');
 
       stream.getTracks().forEach((track) => {

@@ -8,6 +8,7 @@ import { getToken } from '@/utils/token';
 import { getUserInfo } from '@/network/user/getUserInfo';
 import { getPathname } from './utils/url';
 import { handleReceiverSide } from './webrtc/receiver';
+import { rejectCall } from './network/webrtc/rejectCall';
 import io, { Socket } from 'socket.io-client';
 import Emitter from '@/utils/eventEmitter';
 import MsgStore from '@/mobx/msg';
@@ -66,13 +67,14 @@ function App() {
     const pathname = getPathname(window.location.href);
 
     socket.on('call received', (sender) => {
-      handleReceiverSide(sender.uid);
-
       if (pathname !== 'login' && pathname !== 'register') {
         const checked = confirm(`收到用户 ${sender.name} 的语音通话请求`);
 
         if (checked) {
           MultiMediaStore.initMultiMedia(false, sender);
+          handleReceiverSide(sender.uid);
+        } else {
+          rejectCall({ uid: sender.uid });
         }
       }
     });

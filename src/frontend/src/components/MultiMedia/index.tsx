@@ -6,12 +6,15 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { handleSenderSide, pc } from '../../webrtc/sender';
+import { handleReceiverSide } from '../../webrtc/receiver';
 import { socket } from '@/App';
 import { stopConnection } from '../../webrtc/utils';
 import { useAlert } from 'react-alert';
 import Switch from '../Header/components/LeftDropdown/components/Switch';
 import MultiMediaStore from '@/mobx/multiMedia';
+import ChatStore from '@/mobx/chat';
 import './index.scss';
+import { switchToSender } from '@/network/webrtc/switchToSender';
 
 function _MultiMedia() {
   const alert = useAlert();
@@ -20,17 +23,44 @@ function _MultiMedia() {
     if (MultiMediaStore.isSender) {
       handleSenderSide();
     } else {
-      // handleReceiverSide(MultiMediaStore.sender?.uid);
+      switchToSender({ uid: MultiMediaStore.sender?.uid });
+      handleSenderSide();
     }
-  }, []); // MultiMediaStore.isAudioOpen, MultiMediaStore.isVideoOpen
+  }, [MultiMediaStore.isAudioOpen, MultiMediaStore.isVideoOpen]);
 
   useEffect(() => {
     socket.on('terminate call received', () => {
       stopConnection(pc, false);
 
-      alert.show('对方已结束通话');
+      alert.show('对方已结束通话', {
+        onClose: () => {
+          location.reload();
+        },
+      });
     });
-  });
+
+    socket.on('reject call received', () => {
+      ChatStore.setIsMultiMedia(false);
+      alert.show('对方拒绝通话');
+    });
+
+    socket.on('switch to sender received', (sender) => {
+      MultiMediaStore.initMultiMedia(
+        false,
+        sender,
+        MultiMediaStore.isAudioOpen,
+        MultiMediaStore.isVideoOpen,
+      );
+      handleReceiverSide(sender.uid);
+    });
+  }, []);
+
+  useEffect(() => {
+    // 刷新页面时断开连接
+    window.addEventListener('beforeunload', () => {
+      stopConnection(pc);
+    });
+  }, []);
 
   return (
     <div className='c-multimedia'>
@@ -80,6 +110,7 @@ function _MultiMedia() {
           className='c-multimedia-operation-stop'
           onClick={() => {
             stopConnection(pc);
+            location.reload();
           }}
         >
           终止通话

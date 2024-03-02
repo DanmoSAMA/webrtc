@@ -24,6 +24,8 @@ rules:
     - error
     - ignore:
         - css
+  max-nested-callbacks: off
+  max-params: off
 
 settings:
   import/resolver:
