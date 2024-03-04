@@ -7,7 +7,7 @@ import { BackendHost } from '@/consts';
 import { getToken } from '@/utils/token';
 import { getUserInfo } from '@/network/user/getUserInfo';
 import { getPathname } from './utils/url';
-import { handleReceiverSide } from './webrtc/receiver';
+import { handleReceiverSide } from './webrtc/single/receiver';
 import { rejectCall } from './network/webrtc/rejectCall';
 import io, { Socket } from 'socket.io-client';
 import Emitter from '@/utils/eventEmitter';

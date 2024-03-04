@@ -6,12 +6,27 @@
   flex-direction: column;
   position: relative;
 
+  &-header {
+    height: 30px;
+    line-height: 30px;
+    display: flex;
+    justify-content: center;
+    font-size: 14px;
+    user-select: none;
+    background: var(--global-bg-primary_lighter);
+    color: var(--global-font-primary);
+
+    &-btn {
+      cursor: pointer;
+      color: var(--global-font-secondary);
+    }
+  }
+
   &-chat_area {
     width: 100%;
     position: absolute;
     display: flex;
     flex-direction: column;
-    top: 0;
     bottom: 60px;
     padding-bottom: 100px;
     background: var(--global-bg-primary_darker);

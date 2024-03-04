@@ -12,6 +12,7 @@ class MultiMediaState {
   public isVideoOpen = true;
   public isSender = true;
   public sender: IUser | null = null;
+  public memberList: IUser[] = [];
 
   public constructor() {
     makeAutoObservable(this);
@@ -36,7 +37,7 @@ class MultiMediaState {
   }
 
   /**
-   * 设置是否为发送方
+   * 设置是否为发送方（单聊）
    * @param val 要设置的值
    * @returns void
    */
@@ -45,7 +46,7 @@ class MultiMediaState {
   }
 
   /**
-   * 设置发送方信息
+   * 设置发送方信息（单聊）
    * @param val 要设置的值
    * @returns void
    */
@@ -80,6 +81,15 @@ class MultiMediaState {
     this.isAudioOpen = isAudioOpen ?? true;
     this.isVideoOpen = isVideoOpen ?? true;
     this.isSender = isSender;
+  }
+
+  /**
+   * 加入群语音
+   * @param user 加入群语音的用户
+   * @returns void
+   */
+  public joinGroupVideoChat(user: IUser) {
+    this.memberList.push(user);
   }
 }
 

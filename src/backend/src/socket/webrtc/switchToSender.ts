@@ -6,6 +6,7 @@ import { Socket } from 'socket.io';
 import { socketIdMap } from '..';
 import { UserModel } from '@models/user';
 import { isTokenValid, decodeToken } from '@utils/jwt';
+import { HttpCode } from '../../../../shared/consts/httpCode';
 
 export function onSwitchToSender(io: any, socket: Socket) {
   socket.on(
@@ -20,6 +21,7 @@ export function onSwitchToSender(io: any, socket: Socket) {
       const sender = await UserModel.findOne({ uid: senderUid });
 
       socket.to(socketId).emit('switch to sender received', sender);
+      callback(HttpCode.OK);
     },
   );
 }

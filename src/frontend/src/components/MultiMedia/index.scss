@@ -8,25 +8,4 @@
   position: relative;
   background: var(--global-bg-primary_darker);
   color: var(--global-font-primary);
-
-  &-operation {
-    display: flex;
-    margin-top: 30px;
-
-    &-item {
-      display: flex;
-      align-items: center;
-      margin: 0 30px;
-    }
-
-    &-stop {
-      cursor: pointer;
-      font-size: 18px;
-      height: 25px;
-      margin-left: 30px;
-      padding: 5px;
-      border: 2px solid var(--global-font-primary);
-      border-radius: 12.5px;
-    }
-  }
 }

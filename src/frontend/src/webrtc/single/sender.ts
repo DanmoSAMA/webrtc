@@ -1,6 +1,7 @@
 import { socket } from '@/App';
 import ChatStore from '@/mobx/chat';
 import MultiMediaStore from '@/mobx/multiMedia';
+import { getToken } from '@/utils/token';
 
 export const pc = new RTCPeerConnection();
 
@@ -54,6 +55,7 @@ export function handleSenderSide() {
           'sdp offer request',
           pc.localDescription,
           ChatStore.currentChat?.uid,
+          getToken(),
         );
       })
       .catch((error) => {

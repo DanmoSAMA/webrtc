@@ -132,7 +132,7 @@ function _Toggle() {
   }
 
   async function onJoinGroupSubmit(reqData: any) {
-    reqData.messageType = MessageType.JoinGroupNotify;
+    reqData.messageType = MessageType.JoinGroupRequestNotify;
     reqData.receiver = parseInt(reqData.receiver, 10); // gid
 
     const { code } = await joinGroup(reqData);

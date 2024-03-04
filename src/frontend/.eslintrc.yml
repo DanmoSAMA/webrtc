@@ -26,6 +26,7 @@ rules:
         - css
   max-nested-callbacks: off
   max-params: off
+  @typescript-eslint/prefer-for-of: off
 
 settings:
   import/resolver:

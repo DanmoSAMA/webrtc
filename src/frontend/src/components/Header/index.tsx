@@ -2,6 +2,12 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useShowDropDown } from './hooks/useShowDropdown';
 import { call } from '@/network/webrtc/call';
+import { useAlert } from 'react-alert';
+import { isOnline, isSingleChat } from '@/utils/chat';
+import { startGroupVideo } from '@/network/group/startGroupVideo';
+import { initOwnMedia, listenToEventAndSocket } from '@/webrtc/group';
+import { getUid } from '@/utils/uid';
+import { joinGroupVideo } from '@/network/group/joinGroupVideo';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Search from './components/Search';
@@ -9,6 +15,7 @@ import LeftDropdown from './components/LeftDropdown';
 import RightDropdown from './components/RightDropdown';
 import QueryDropdown from './components/QueryDropdown';
 import MultiMediaStore from '@/mobx/multiMedia';
+import GroupStore from '@/mobx/group';
 import './index.scss';
 
 function _Header() {
@@ -18,6 +25,54 @@ function _Header() {
     setShowDropDown: setShowRightDropDown,
   } = useShowDropDown();
   const [showQueryDropdown, setShowQueryDropdown] = useState(false);
+  const alert = useAlert();
+
+  // function handleAudioChat() {
+  //   if (isSingleChat()) {
+  //     if (isOnline()) {
+  //       ChatStore.setIsMultiMedia(true);
+  //       MultiMediaStore.setAudioOpenState(true);
+  //       MultiMediaStore.setVideoOpenState(false);
+
+  //       call({ uid: ChatStore.currentChat?.uid });
+  //     } else {
+  //       alert.show('对方处于离线状态，请稍后再试', {
+  //         title: '操作失败 ',
+  //       });
+  //     }
+  //   }
+  // }
+
+  async function handleVideoChat() {
+    MultiMediaStore.setAudioOpenState(true);
+    MultiMediaStore.setVideoOpenState(true);
+
+    if (isSingleChat()) {
+      if (isOnline()) {
+        ChatStore.setIsMultiMedia(true);
+        call({ uid: ChatStore.currentChat?.uid });
+      } else {
+        alert.show('对方处于离线状态，请稍后再试', {
+          title: '操作失败 ',
+        });
+      }
+    } else {
+      if (MultiMediaStore.memberList.find((item) => item.uid === getUid())) {
+        alert.show('您已在群语音中');
+        return;
+      }
+
+      if (MultiMediaStore.memberList.length === 0) {
+        ChatStore.setIsMultiMedia(true);
+        await startGroupVideo({ gid: GroupStore.gid });
+
+        await initOwnMedia();
+        listenToEventAndSocket();
+      } else {
+        alert.show('请加入已经创建好的语音通话');
+      }
+    }
+  }
 
   return (
     <div className='c-header'>
@@ -64,33 +119,13 @@ function _Header() {
               width: '33px',
               height: '33px',
               position: 'absolute',
-              right: '280px',
+              right: '210px',
               cursor: 'pointer',
             }}
-            onClick={() => {
-              // if (ChatStore.currentChat?.uid) {
-              //   if (ChatStore.currentChat?.online) {
-              //     ChatStore.setIsMultiMedia(true);
-              //     MultiMediaStore.setAudioOpenState(true);
-              //     MultiMediaStore.setVideoOpenState(false);
-
-              //     call({ uid: ChatStore.currentChat?.uid });
-              //   } else {
-              //     alert.show('对方处于离线状态，请稍后再试', {
-              //       title: '操作失败 ',
-              //     });
-              //   }
-              // }
-
-              ChatStore.setIsMultiMedia(true);
-              MultiMediaStore.setAudioOpenState(true);
-              MultiMediaStore.setVideoOpenState(false);
-
-              call({ uid: ChatStore.currentChat?.uid });
-            }}
+            onClick={handleVideoChat}
           />
         )}
-        {ChatStore.currentChat && (
+        {/* {ChatStore.currentChat && (
           <SvgIcon
             name='video'
             style={{
@@ -101,29 +136,9 @@ function _Header() {
               right: '210px',
               cursor: 'pointer',
             }}
-            onClick={() => {
-              // if (ChatStore.currentChat?.uid) {
-              //   if (ChatStore.currentChat?.online) {
-              //     ChatStore.setIsMultiMedia(true);
-              //     MultiMediaStore.setAudioOpenState(true);
-              //     MultiMediaStore.setVideoOpenState(true);
-
-              //     call({ uid: ChatStore.currentChat?.uid });
-              //   } else {
-              //     alert.show('对方处于离线状态，请稍后再试', {
-              //       title: '操作失败 ',
-              //     });
-              //   }
-              // }
-
-              ChatStore.setIsMultiMedia(true);
-              MultiMediaStore.setAudioOpenState(true);
-              MultiMediaStore.setVideoOpenState(true);
-
-              call({ uid: ChatStore.currentChat?.uid });
-            }}
+            onClick={handleVideoChat}
           />
-        )}
+        )} */}
         {ChatStore.currentChat && (
           <SvgIcon
             name='remoteControl'

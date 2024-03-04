@@ -6,6 +6,7 @@ import { getUid } from '@/utils/uid';
 import { getGroupList } from '@/network/group/getGroupList';
 import GroupStore from './group';
 import AuthorityStore from './authority';
+import { isInGroup } from '@/utils/chat';
 
 class MsgState {
   // 好友请求
@@ -91,13 +92,7 @@ class MsgState {
         break;
       }
       case MessageType.GroupMessage: {
-        const {
-          data: { groups },
-        } = await getGroupList();
-
-        const groupIds = groups.map((group: IGroup) => group.gid);
-
-        if (groupIds.includes(msg.groupId)) {
+        if (await isInGroup(msg.groupId)) {
           this.sendMsg(MessageType.GroupMessage, msg);
         }
         break;

@@ -9,6 +9,7 @@ import { getGroupList } from '../handlers/group/getGroupList';
 import { getIdentity } from '@handlers/group/getIdentity';
 import { getGroupInfo } from '@handlers/group/getGroupInfo';
 import { rejectJoinGroup } from '@handlers/group/rejectJoinGroup';
+import { getGroupVideoChatMembers } from '@handlers/group/getGroupVideoChatMembers';
 
 export const groupRouter = new Router();
 
@@ -17,4 +18,5 @@ groupRouter
   .get('/list', getGroupList)
   .post('/identity', getIdentity)
   .post('/info', getGroupInfo)
-  .post('reject', rejectJoinGroup);
+  .post('/reject', rejectJoinGroup)
+  .post('/video_chat_members', getGroupVideoChatMembers);

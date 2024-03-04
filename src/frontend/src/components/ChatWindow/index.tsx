@@ -4,12 +4,27 @@ import { getUid } from '@/utils/uid';
 import { useEffect } from 'react';
 import { socket } from '@/App';
 import { readMsg } from '@/network/message/readMsg';
-import { asReceiver, asSender, isSingleChat, isThisGroup } from '@/utils/chat';
+import {
+  initOwnMedia,
+  listenToEventAndSocket,
+  sendRequest,
+} from '@/webrtc/group';
+import { joinGroupVideo } from '@/network/group/joinGroupVideo';
+import {
+  asReceiver,
+  asSender,
+  isGroupChat,
+  isInGroup,
+  isSingleChat,
+  isThisGroup,
+} from '@/utils/chat';
 import MsgStore from '@/mobx/msg';
 import ChatStore from '@/mobx/chat';
 import Emitter from '@/utils/eventEmitter';
 import Bubble from './components/Bubble';
 import Sender from './components/Sender';
+import MultiMediaStore from '@/mobx/multiMedia';
+import GroupStore from '@/mobx/group';
 import './index.scss';
 
 function _ChatWindow() {
@@ -84,11 +99,59 @@ function _ChatWindow() {
     socket.on('send group message received', (msg) => {
       MsgStore.handleMsg(msg.messageType, msg);
     });
+
+    socket.on('start group video received', (sender, gid) => {
+      isInGroup(gid).then((checked) => {
+        if (checked && isThisGroup(gid)) {
+          MultiMediaStore.joinGroupVideoChat(sender);
+        }
+      });
+    });
+
+    socket.on('leave group video received', (sender, gid, memberList) => {
+      isInGroup(gid).then((checked) => {
+        if (checked && isThisGroup(gid)) {
+          MultiMediaStore.memberList = memberList;
+        }
+      });
+    });
+
+    socket.on('join group video received', (gid, memberList) => {
+      isInGroup(gid).then((checked) => {
+        if (checked && isThisGroup(gid)) {
+          MultiMediaStore.memberList = memberList;
+        }
+      });
+    });
   }, []);
 
   return (
     <div className='c-chat_window'>
-      <div className='c-chat_window-chat_area'>
+      {isGroupChat() && MultiMediaStore.memberList.length > 0 && (
+        <div className='c-chat_window-header'>
+          {MultiMediaStore.memberList.length} 人正在语音通话中，
+          <span
+            className='c-chat_window-header-btn'
+            onClick={async () => {
+              ChatStore.setIsMultiMedia(true);
+              await joinGroupVideo({ gid: GroupStore.gid });
+
+              await initOwnMedia();
+              listenToEventAndSocket();
+              sendRequest(GroupStore.gid);
+            }}
+          >
+            点击加入
+          </span>
+        </div>
+      )}
+
+      <div
+        className='c-chat_window-chat_area'
+        style={{
+          top: isGroupChat() && MultiMediaStore.memberList.length > 0 ? 30 : 0,
+        }}
+      >
         {isSingleChat() &&
           MsgStore.friendMsg.map(
             ({
@@ -111,7 +174,7 @@ function _ChatWindow() {
                 />
               ),
           )}
-        {!isSingleChat() &&
+        {isGroupChat() &&
           MsgStore.groupMsg.map(
             ({
               sendTime,

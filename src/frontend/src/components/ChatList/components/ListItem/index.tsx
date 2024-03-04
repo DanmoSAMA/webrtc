@@ -3,10 +3,13 @@ import { IChat } from '@/types';
 import { MessageType, ChatType } from '@/enums';
 import { getIdentity } from '@/network/group/getIdentity';
 import { useAlert } from 'react-alert';
+import { getGroupVideoChatMembers } from '@/network/group/getGroupVideoChatMembers';
 import ChatStore from '@/mobx/chat';
 import AuthorityStore from '@/mobx/authority';
 import GroupStore from '@/mobx/group';
+import MultiMediaStore from '@/mobx/multiMedia';
 import './index.scss';
+import { HttpCode } from '../../../../../../shared/consts/httpCode';
 
 function _ListItem({
   uid,
@@ -46,6 +49,15 @@ function _ListItem({
       AuthorityStore.setIdentity(data.identity);
 
       await GroupStore.init(gid);
+
+      getGroupVideoChatMembers({ gid: GroupStore.gid }).then(
+        ({ code, data }) => {
+          if (code === HttpCode.OK) {
+            const { memberList } = data;
+            MultiMediaStore.memberList = memberList;
+          }
+        },
+      );
     }
   }
 

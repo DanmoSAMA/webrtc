@@ -5,6 +5,7 @@
 
 import { Socket } from 'socket.io';
 import { socketIdMap } from '..';
+import { HttpCode } from '../../../../shared/consts/httpCode';
 
 export function onRejectCall(io: any, socket: Socket) {
   socket.on(
@@ -13,6 +14,7 @@ export function onRejectCall(io: any, socket: Socket) {
       const socketId = socketIdMap.get(receiverUid);
 
       socket.to(socketId).emit('reject call received');
+      callback(HttpCode.OK);
     },
   );
 }

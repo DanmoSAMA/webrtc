@@ -23,10 +23,13 @@ import { onLogout } from './user/logout';
 import { onSdpOffer } from './webrtc/sdpOffer';
 import { onSdpAnswer } from './webrtc/sdpAnswer';
 import { onIceCandidate } from './webrtc/iceCandidate';
-import { onCall } from './webrtc/call';
-import { onTerminateCall } from './webrtc/terminateCall';
-import { onRejectCall } from './webrtc/rejectCall';
+import { onCall } from './user/call';
+import { onTerminateCall } from './user/terminateCall';
+import { onRejectCall } from './user/rejectCall';
 import { onSwitchToSender } from './webrtc/switchToSender';
+import { onStartGroupVideo } from './group/startGroupVideo';
+import { onLeaveGroupVideo } from './group/leaveGroupVideo';
+import { onJoinGroupVideo } from './group/joinGroupVideo';
 
 export const uidSet = new Set(); // 保存在线用户 uid 的集合
 
@@ -35,6 +38,9 @@ export function checkOnline(uid: any) {
 }
 
 export const socketIdMap = new Map();
+
+// [{ gid: 100001, memberList: [{ uid: 100001, name: '' }] }]
+export const groupVideoChatRooms = [];
 
 export default function setupSocket(server: any) {
   const io = new Server(server, {
@@ -94,5 +100,11 @@ export default function setupSocket(server: any) {
     onRejectCall(io, socket);
 
     onSwitchToSender(io, socket);
+
+    onStartGroupVideo(io, socket);
+
+    onLeaveGroupVideo(io, socket);
+
+    onJoinGroupVideo(io, socket);
   });
 }

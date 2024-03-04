@@ -7,6 +7,7 @@ import { Socket } from 'socket.io';
 import { socketIdMap } from '..';
 import { isTokenValid, decodeToken } from '@utils/jwt';
 import { UserModel } from '@models/user';
+import { HttpCode } from '../../../../shared/consts/httpCode';
 
 export function onCall(io: any, socket: Socket) {
   socket.on('call request', async ({ senderToken, receiverUid }, callback) => {
@@ -19,5 +20,6 @@ export function onCall(io: any, socket: Socket) {
     const sender = await UserModel.findOne({ uid: senderUid });
 
     socket.to(socketId).emit('call received', sender);
+    callback(HttpCode.OK);
   });
 }

@@ -1,5 +1,5 @@
 /**
- * description: 获取好友列表
+ * description: 获取群列表
  * date: 2024-02-13 21:15:00 +0800
  */
 
