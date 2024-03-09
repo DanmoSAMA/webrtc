@@ -86,6 +86,21 @@ function App() {
     fetchUserInfo();
   }, []);
 
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true,
+        audio: true,
+      })
+      .then((_stream) => {
+        console.log('设置了 stream');
+        MultiMediaStore.stream = _stream;
+      })
+      .catch((error) => {
+        console.log('获取媒体流失败: ', error);
+      });
+  }, []);
+
   return (
     <Provider template={AlertMUITemplate} {...options}>
       <RouterProvider router={router} />

@@ -13,6 +13,8 @@ class MultiMediaState {
   public isSender = true;
   public sender: IUser | null = null;
   public memberList: IUser[] = [];
+  // @ts-ignore
+  public stream: MediaStream;
 
   public constructor() {
     makeAutoObservable(this);

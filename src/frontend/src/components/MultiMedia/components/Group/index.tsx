@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { socket } from '@/App';
 import { isInGroup, isThisGroup } from '@/utils/chat';
 import { getUid } from '@/utils/uid';
+import { GroupVideoCall } from '@/webrtc/group';
 import Switch from '@/components/Header/components/LeftDropdown/components/Switch';
 import MultiMediaStore from '@/mobx/multiMedia';
 import ChatStore from '@/mobx/chat';
@@ -23,10 +24,29 @@ function _MultiMediaGroup() {
   }, []);
 
   useEffect(() => {
-    socket.on('join group video received', (gid, memberList) => {
+    setTimeout(() => {
+      const MediaElement = document.querySelector(
+        `video#group_video_${getUid()}`,
+      ) as HTMLMediaElement;
+
+      MediaElement.srcObject = MultiMediaStore.stream;
+
+      MediaElement.onloadedmetadata = () => {
+        MediaElement.play();
+      };
+    }, 100);
+  }, []);
+
+  useEffect(() => {
+    socket.on('join group video received', (gid, memberList, sender) => {
       isInGroup(gid).then((checked) => {
         if (checked && isThisGroup(gid)) {
           MultiMediaStore.memberList = memberList;
+
+          if (sender.uid !== getUid()) {
+            // 创建新的 pc 并监听事件
+            new GroupVideoCall(MultiMediaStore.stream);
+          }
         }
       });
     });

@@ -5,9 +5,7 @@ import { call } from '@/network/webrtc/call';
 import { useAlert } from 'react-alert';
 import { isOnline, isSingleChat } from '@/utils/chat';
 import { startGroupVideo } from '@/network/group/startGroupVideo';
-import { initOwnMedia, listenToEventAndSocket } from '@/webrtc/group';
 import { getUid } from '@/utils/uid';
-import { joinGroupVideo } from '@/network/group/joinGroupVideo';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Search from './components/Search';
@@ -65,9 +63,6 @@ function _Header() {
       if (MultiMediaStore.memberList.length === 0) {
         ChatStore.setIsMultiMedia(true);
         await startGroupVideo({ gid: GroupStore.gid });
-
-        await initOwnMedia();
-        listenToEventAndSocket();
       } else {
         alert.show('请加入已经创建好的语音通话');
       }

@@ -21,15 +21,13 @@ export function onJoinGroupVideo(io: any, socket: Socket) {
       const sender = await UserModel.findOne({ uid: senderUid });
       const temp = groupVideoChatRooms.find((item) => item.gid === gid);
 
-      console.log('🐮', temp);
-
       if (temp && !temp.memberList.includes(sender)) {
         console.log('🐱');
         temp.memberList.push(sender);
       }
 
-      io.emit('join group video received', gid, temp.memberList);
-      callback(HttpCode.OK);
+      io.emit('join group video received', gid, temp.memberList, sender);
+      callback(HttpCode.OK, temp.memberList);
     },
   );
 }

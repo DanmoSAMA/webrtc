@@ -19,9 +19,8 @@ export function joinGroupVideo(reqData: IJoinGroupVideo): Promise<any> {
         senderToken: getToken(),
         gid: reqData.gid,
       },
-      (code: HttpCode) => {
-        console.log('😄', code);
-        resolve({ code, data: null });
+      (code: HttpCode, data: any) => {
+        resolve({ code, data });
       },
     );
   });

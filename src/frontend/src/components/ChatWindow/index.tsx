@@ -4,11 +4,7 @@ import { getUid } from '@/utils/uid';
 import { useEffect } from 'react';
 import { socket } from '@/App';
 import { readMsg } from '@/network/message/readMsg';
-import {
-  initOwnMedia,
-  listenToEventAndSocket,
-  sendRequest,
-} from '@/webrtc/group';
+import { GroupVideoCall } from '../../webrtc/group/index';
 import { joinGroupVideo } from '@/network/group/joinGroupVideo';
 import {
   asReceiver,
@@ -134,11 +130,20 @@ function _ChatWindow() {
             className='c-chat_window-header-btn'
             onClick={async () => {
               ChatStore.setIsMultiMedia(true);
-              await joinGroupVideo({ gid: GroupStore.gid });
 
-              await initOwnMedia();
-              listenToEventAndSocket();
-              sendRequest(GroupStore.gid);
+              const { data: memberList } = await joinGroupVideo({
+                gid: GroupStore.gid,
+              });
+
+              // 等到对面 pc 开始监听，再发送请求
+              setTimeout(() => {
+                for (let i = 0; i < memberList.length - 1; i++) {
+                  const groupVideoCall = new GroupVideoCall(
+                    MultiMediaStore.stream,
+                  );
+                  groupVideoCall.sendRequest(memberList[i].uid);
+                }
+              }, 100);
             }}
           >
             点击加入
