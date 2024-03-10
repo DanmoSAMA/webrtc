@@ -5,7 +5,6 @@
 
 import { socket } from '@/App';
 import { getToken } from '@/utils/token';
-import MultiMediaStore from '@/mobx/multiMedia';
 
 export class GroupVideoCall {
   pc: RTCPeerConnection;
@@ -23,6 +22,12 @@ export class GroupVideoCall {
 
   setListener() {
     socket.on('sdp offer received', (offer, sender) => {
+      // console.log('🐮', this.pc.remoteDescription, sender);
+
+      if (this.pc.remoteDescription !== null) {
+        return;
+      }
+
       console.log('receiver: get sdp offer');
 
       this.remoteUid = sender.uid;
@@ -56,6 +61,10 @@ export class GroupVideoCall {
     });
 
     socket.on('sdp answer received', (answer, receiver) => {
+      if (this.pc.remoteDescription !== null) {
+        return;
+      }
+
       if (this.remoteUid === receiver.uid) {
         console.log('sender: get sdp answer');
 
@@ -103,7 +112,7 @@ export class GroupVideoCall {
           `video#group_video_${this.remoteUid}`,
         ) as HTMLMediaElement;
 
-        console.log(this.remoteUid, MediaElement);
+        // console.log(this.remoteUid, MediaElement);
 
         MediaElement.srcObject = e.streams[0];
 
@@ -115,13 +124,6 @@ export class GroupVideoCall {
   }
 
   addTrack() {
-    if (!MultiMediaStore.isAudioOpen) {
-      this.stream.getAudioTracks().forEach((track) => track.stop());
-    }
-    if (!MultiMediaStore.isVideoOpen) {
-      this.stream.getVideoTracks().forEach((track) => track.stop());
-    }
-
     console.log('sender: add track');
 
     this.stream.getTracks().forEach((track) => {
@@ -130,8 +132,6 @@ export class GroupVideoCall {
   }
 
   sendRequest(uid: any) {
-    console.log('🐎', uid);
-
     this.remoteUid = uid;
 
     this.pc

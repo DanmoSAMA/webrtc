@@ -23,6 +23,25 @@ import MultiMediaStore from '@/mobx/multiMedia';
 import GroupStore from '@/mobx/group';
 import './index.scss';
 
+async function handleJoinVideoChat() {
+  ChatStore.setIsMultiMedia(true);
+
+  const { data: memberList } = await joinGroupVideo({
+    gid: GroupStore.gid,
+  });
+
+  // 等到对面 pc 开始监听，再发送请求
+  setTimeout(() => {
+    for (let i = 0; i < memberList.length; i++) {
+      if (memberList[i].uid === getUid()) {
+        continue;
+      }
+      const gvc = new GroupVideoCall(MultiMediaStore.stream);
+      gvc.sendRequest(memberList[i].uid);
+    }
+  }, 100);
+}
+
 function _ChatWindow() {
   const uid = getUid();
 
@@ -128,21 +147,7 @@ function _ChatWindow() {
           {MultiMediaStore.memberList.length} 人正在语音通话中，
           <span
             className='c-chat_window-header-btn'
-            onClick={async () => {
-              ChatStore.setIsMultiMedia(true);
-
-              const { data: memberList } = await joinGroupVideo({
-                gid: GroupStore.gid,
-              });
-
-              // 等到对面 pc 开始监听，再发送请求
-              setTimeout(() => {
-                for (let i = 0; i < memberList.length - 1; i++) {
-                  const gvc = new GroupVideoCall(MultiMediaStore.stream);
-                  gvc.sendRequest(memberList[i].uid);
-                }
-              }, 100);
-            }}
+            onClick={handleJoinVideoChat}
           >
             点击加入
           </span>

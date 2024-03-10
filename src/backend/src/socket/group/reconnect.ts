@@ -1,6 +1,6 @@
 /**
- * description: 加入群语音
- * date: 2024-03-03 15:51:46 +0800
+ * description: 重新建立连接
+ * date: 2024-03-10 14:48:32 +0800
  */
 
 import { Socket } from 'socket.io';
@@ -9,9 +9,9 @@ import { groupVideoChatRooms } from '..';
 import { UserModel } from '@models/user';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 
-export function onJoinGroupVideo(io: any, socket: Socket) {
+export function onReconnect(io: any, socket: Socket) {
   socket.on(
-    'join group video request',
+    'reconnect group video request',
     async ({ senderToken, gid }, callback) => {
       let senderUid;
       if (isTokenValid(senderToken)) {
@@ -21,11 +21,7 @@ export function onJoinGroupVideo(io: any, socket: Socket) {
       const sender = await UserModel.findOne({ uid: senderUid });
       const temp = groupVideoChatRooms.find((item) => item.gid === gid);
 
-      if (temp && !temp.memberList.includes(sender)) {
-        temp.memberList.push(sender);
-      }
-
-      io.emit('join group video received', gid, temp.memberList, sender);
+      io.emit('reconnect group video received', gid, sender);
       callback(HttpCode.OK, temp.memberList);
     },
   );

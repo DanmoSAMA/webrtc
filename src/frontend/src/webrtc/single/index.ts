@@ -54,15 +54,12 @@ export class SingleVideoCall {
       }
     };
 
-    let hasReceivedAnswer = false;
-
     socket.on('sdp answer received', (answer) => {
-      if (hasReceivedAnswer) {
+      if (this.pc.remoteDescription !== null) {
         return;
       }
 
       console.log('sender: get sdp answer');
-      hasReceivedAnswer = true;
 
       this.pc
         .setRemoteDescription(answer)
@@ -133,16 +130,12 @@ export class SingleVideoCall {
       }
     };
 
-    let hasReceivedOffer = false;
-
     socket.on('sdp offer received', (offer) => {
-      if (hasReceivedOffer) {
+      if (this.pc.remoteDescription !== null) {
         return;
       }
 
       console.log('receiver: get sdp offer');
-
-      hasReceivedOffer = true;
 
       const sessionDescription = new RTCSessionDescription(offer);
 

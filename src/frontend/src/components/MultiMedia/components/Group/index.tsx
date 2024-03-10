@@ -10,11 +10,29 @@ import { socket } from '@/App';
 import { isInGroup, isThisGroup } from '@/utils/chat';
 import { getUid } from '@/utils/uid';
 import { GroupVideoCall } from '@/webrtc/group';
+import { reconnect } from '@/network/group/reconnect';
 import Switch from '@/components/Header/components/LeftDropdown/components/Switch';
 import MultiMediaStore from '@/mobx/multiMedia';
 import ChatStore from '@/mobx/chat';
 import GroupStore from '@/mobx/group';
 import './index.scss';
+
+async function handleReconnect() {
+  const { data: memberList } = await reconnect({
+    gid: GroupStore.gid,
+  });
+
+  // 等到对面 pc 开始监听，再发送请求
+  setTimeout(() => {
+    for (let i = 0; i < memberList.length; i++) {
+      if (memberList[i].uid === getUid()) {
+        continue;
+      }
+      const gvc = new GroupVideoCall(MultiMediaStore.stream);
+      gvc.sendRequest(memberList[i].uid);
+    }
+  }, 100);
+}
 
 function _MultiMediaGroup() {
   useEffect(() => {
@@ -35,7 +53,7 @@ function _MultiMediaGroup() {
         MediaElement.play();
       };
     }, 100);
-  }, []);
+  }, [MultiMediaStore.stream]);
 
   useEffect(() => {
     socket.on('join group video received', (gid, memberList, sender) => {
@@ -43,6 +61,17 @@ function _MultiMediaGroup() {
         if (checked && isThisGroup(gid)) {
           MultiMediaStore.memberList = memberList;
 
+          if (sender.uid !== getUid()) {
+            // 创建新的 pc 并监听事件
+            new GroupVideoCall(MultiMediaStore.stream);
+          }
+        }
+      });
+    });
+
+    socket.on('reconnect group video received', (gid, sender) => {
+      isInGroup(gid).then((checked) => {
+        if (checked && isThisGroup(gid)) {
           if (sender.uid !== getUid()) {
             // 创建新的 pc 并监听事件
             new GroupVideoCall(MultiMediaStore.stream);
@@ -72,9 +101,10 @@ function _MultiMediaGroup() {
           音频：
           <Switch
             checked={MultiMediaStore.isAudioOpen}
-            onChange={(e) => {
-              const value = e.target.checked;
-              MultiMediaStore.setAudioOpenState(value);
+            onChange={async (e) => {
+              MultiMediaStore.setAudioOpenState(e.target.checked);
+              await MultiMediaStore.setStream();
+              handleReconnect();
             }}
             style={{ position: 'static' }}
           />
@@ -83,9 +113,10 @@ function _MultiMediaGroup() {
           视频：
           <Switch
             checked={MultiMediaStore.isVideoOpen}
-            onChange={(e) => {
-              const value = e.target.checked;
-              MultiMediaStore.setVideoOpenState(value);
+            onChange={async (e) => {
+              MultiMediaStore.setVideoOpenState(e.target.checked);
+              await MultiMediaStore.setStream();
+              handleReconnect();
             }}
             style={{ position: 'static' }}
           />

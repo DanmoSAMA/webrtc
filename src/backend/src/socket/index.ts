@@ -32,6 +32,7 @@ import { onLeaveGroupVideo } from './group/leaveGroupVideo';
 import { onJoinGroupVideo } from './group/joinGroupVideo';
 import { onAcceptCall } from './user/acceptCall';
 import { onSwitchToReceiver } from './webrtc/switchToReceiver';
+import { onReconnect } from './group/reconnect';
 
 export const uidSet = new Set(); // 保存在线用户 uid 的集合
 
@@ -112,5 +113,7 @@ export default function setupSocket(server: any) {
     onLeaveGroupVideo(io, socket);
 
     onJoinGroupVideo(io, socket);
+
+    onReconnect(io, socket);
   });
 }
