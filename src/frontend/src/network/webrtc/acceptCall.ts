@@ -1,20 +1,20 @@
 /**
- * description: 转换为发送者
- * date: 2024-03-02 16:55:18 +0800
+ * description: 同意通话
+ * date: 2024-03-09 19:48:16 +0800
  */
 
 import { getToken } from '@/utils/token';
 import { socket } from '../../App';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 
-export interface ISwitchToSender {
+export interface IAcceptCall {
   uid: any;
 }
 
-export function switchToSender(reqData: ISwitchToSender): Promise<any> {
+export function acceptCall(reqData: IAcceptCall): Promise<any> {
   return new Promise((resolve) => {
     socket.emit(
-      'switch to sender request',
+      'accept call request',
       {
         senderToken: getToken(),
         receiverUid: reqData.uid,

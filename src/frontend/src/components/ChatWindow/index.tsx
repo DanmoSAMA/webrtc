@@ -138,10 +138,8 @@ function _ChatWindow() {
               // 等到对面 pc 开始监听，再发送请求
               setTimeout(() => {
                 for (let i = 0; i < memberList.length - 1; i++) {
-                  const groupVideoCall = new GroupVideoCall(
-                    MultiMediaStore.stream,
-                  );
-                  groupVideoCall.sendRequest(memberList[i].uid);
+                  const gvc = new GroupVideoCall(MultiMediaStore.stream);
+                  gvc.sendRequest(memberList[i].uid);
                 }
               }, 100);
             }}

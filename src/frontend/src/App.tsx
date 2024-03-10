@@ -7,8 +7,9 @@ import { BackendHost } from '@/consts';
 import { getToken } from '@/utils/token';
 import { getUserInfo } from '@/network/user/getUserInfo';
 import { getPathname } from './utils/url';
-import { handleReceiverSide } from './webrtc/single/receiver';
 import { rejectCall } from './network/webrtc/rejectCall';
+import { acceptCall } from './network/webrtc/acceptCall';
+import { SingleVideoCall } from './webrtc/single/index';
 import io, { Socket } from 'socket.io-client';
 import Emitter from '@/utils/eventEmitter';
 import MsgStore from '@/mobx/msg';
@@ -71,8 +72,16 @@ function App() {
         const checked = confirm(`收到用户 ${sender.name} 的语音通话请求`);
 
         if (checked) {
-          MultiMediaStore.initMultiMedia(false, sender);
-          handleReceiverSide(sender.uid);
+          MultiMediaStore.initMultiMedia(
+            false,
+            sender,
+            MultiMediaStore.isAudioOpen,
+            MultiMediaStore.isVideoOpen,
+          );
+          const svc = new SingleVideoCall(MultiMediaStore.stream);
+          MultiMediaStore.svc = svc;
+          svc.handleReceiverSide(sender.uid);
+          acceptCall({ uid: sender.uid });
         } else {
           rejectCall({ uid: sender.uid });
         }
@@ -87,18 +96,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((_stream) => {
-        console.log('设置了 stream');
-        MultiMediaStore.stream = _stream;
-      })
-      .catch((error) => {
-        console.log('获取媒体流失败: ', error);
-      });
+    MultiMediaStore.setStream();
   }, []);
 
   return (

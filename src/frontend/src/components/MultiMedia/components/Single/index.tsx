@@ -5,12 +5,11 @@
 
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { handleSenderSide, pc } from '../../../../webrtc/single/sender';
-import { handleReceiverSide } from '../../../../webrtc/single/receiver';
+import { SingleVideoCall } from '../../../../webrtc/single';
 import { socket } from '@/App';
-import { stopConnection } from '../../../../webrtc/single/utils';
 import { useAlert } from 'react-alert';
 import { switchToSender } from '@/network/webrtc/switchToSender';
+import { switchToReceiver } from '@/network/webrtc/switchToReceiver';
 import Switch from '../../../Header/components/LeftDropdown/components/Switch';
 import MultiMediaStore from '@/mobx/multiMedia';
 import ChatStore from '@/mobx/chat';
@@ -20,17 +19,20 @@ function _MultiMediaSingle() {
   const alert = useAlert();
 
   useEffect(() => {
-    if (MultiMediaStore.isSender) {
-      handleSenderSide();
-    } else {
-      switchToSender({ uid: MultiMediaStore.sender?.uid });
-      handleSenderSide();
-    }
-  }, [MultiMediaStore.isAudioOpen, MultiMediaStore.isVideoOpen]);
+    const ownSideMediaElement = document.querySelector(
+      'video#ownSide',
+    ) as HTMLMediaElement;
+
+    ownSideMediaElement.srcObject = MultiMediaStore.stream;
+
+    ownSideMediaElement.onloadedmetadata = () => {
+      ownSideMediaElement.play();
+    };
+  }, [MultiMediaStore.stream]);
 
   useEffect(() => {
     socket.on('terminate call received', () => {
-      stopConnection(pc, false);
+      MultiMediaStore.svc.stopConnection(false);
 
       alert.show('对方已结束通话', {
         onClose: () => {
@@ -44,6 +46,12 @@ function _MultiMediaSingle() {
       alert.show('对方拒绝通话');
     });
 
+    socket.on('accept call received', () => {
+      const svc = new SingleVideoCall(MultiMediaStore.stream);
+      MultiMediaStore.svc = svc;
+      svc.handleSenderSide();
+    });
+
     socket.on('switch to sender received', (sender) => {
       MultiMediaStore.initMultiMedia(
         false,
@@ -51,14 +59,26 @@ function _MultiMediaSingle() {
         MultiMediaStore.isAudioOpen,
         MultiMediaStore.isVideoOpen,
       );
-      handleReceiverSide(sender.uid);
+      console.log('switch to sender received');
+
+      const svc = new SingleVideoCall(MultiMediaStore.stream);
+      MultiMediaStore.svc = svc;
+      svc.handleReceiverSide(sender.uid);
+
+      switchToReceiver({ uid: sender.uid });
+    });
+
+    socket.on('switch to receiver received', () => {
+      const svc = new SingleVideoCall(MultiMediaStore.stream);
+      MultiMediaStore.svc = svc;
+      svc.handleSenderSide();
     });
   }, []);
 
   useEffect(() => {
     // 刷新页面时断开连接
     window.addEventListener('beforeunload', () => {
-      stopConnection(pc);
+      MultiMediaStore.svc.stopConnection();
     });
   }, []);
 
@@ -88,9 +108,10 @@ function _MultiMediaSingle() {
           音频：
           <Switch
             checked={MultiMediaStore.isAudioOpen}
-            onChange={(e) => {
-              const value = e.target.checked;
-              MultiMediaStore.setAudioOpenState(value);
+            onChange={async (e) => {
+              MultiMediaStore.setAudioOpenState(e.target.checked);
+              await MultiMediaStore.setStream();
+              switchToSender({ uid: ChatStore.currentChat?.uid });
             }}
             style={{ position: 'static' }}
           />
@@ -99,9 +120,10 @@ function _MultiMediaSingle() {
           视频：
           <Switch
             checked={MultiMediaStore.isVideoOpen}
-            onChange={(e) => {
-              const value = e.target.checked;
-              MultiMediaStore.setVideoOpenState(value);
+            onChange={async (e) => {
+              MultiMediaStore.setVideoOpenState(e.target.checked);
+              await MultiMediaStore.setStream();
+              switchToSender({ uid: ChatStore.currentChat?.uid });
             }}
             style={{ position: 'static' }}
           />
@@ -109,7 +131,7 @@ function _MultiMediaSingle() {
         <div
           className='c-multimedia-operation-stop'
           onClick={() => {
-            stopConnection(pc);
+            MultiMediaStore.svc.stopConnection();
             location.reload();
           }}
         >

@@ -5,6 +5,7 @@
 
 import { makeAutoObservable } from 'mobx';
 import { IUser } from '@/types';
+import { SingleVideoCall } from '@/webrtc/single';
 import ChatStore from './chat';
 
 class MultiMediaState {
@@ -15,6 +16,7 @@ class MultiMediaState {
   public memberList: IUser[] = [];
   // @ts-ignore
   public stream: MediaStream;
+  public svc: SingleVideoCall;
 
   public constructor() {
     makeAutoObservable(this);
@@ -36,15 +38,6 @@ class MultiMediaState {
    */
   public setVideoOpenState(val: boolean) {
     this.isVideoOpen = val;
-  }
-
-  /**
-   * 设置是否为发送方（单聊）
-   * @param val 要设置的值
-   * @returns void
-   */
-  public setIsSender(val: boolean) {
-    this.isSender = val;
   }
 
   /**
@@ -76,13 +69,14 @@ class MultiMediaState {
       });
 
       this.sender = sender;
+      this.isSender = false;
     }
 
     ChatStore.isMultiMedia = true;
 
     this.isAudioOpen = isAudioOpen ?? true;
     this.isVideoOpen = isVideoOpen ?? true;
-    this.isSender = isSender;
+    this.isSender = true;
   }
 
   /**
@@ -92,6 +86,37 @@ class MultiMediaState {
    */
   public joinGroupVideoChat(user: IUser) {
     this.memberList.push(user);
+  }
+
+  /**
+   * 设置 stream
+   * @param void
+   * @returns void
+   */
+  public setStream(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      navigator.mediaDevices
+        .getUserMedia({
+          video: true,
+          audio: true,
+        })
+        .then((_stream) => {
+          if (!this.isAudioOpen) {
+            _stream.getAudioTracks().forEach((track) => track.stop());
+          }
+          if (!this.isVideoOpen) {
+            _stream.getVideoTracks().forEach((track) => track.stop());
+          }
+
+          MultiMediaStore.stream = _stream;
+
+          resolve();
+        })
+        .catch((error) => {
+          console.log('获取媒体流失败: ', error);
+          reject(error);
+        });
+    });
   }
 }
 

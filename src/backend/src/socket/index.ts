@@ -30,6 +30,8 @@ import { onSwitchToSender } from './webrtc/switchToSender';
 import { onStartGroupVideo } from './group/startGroupVideo';
 import { onLeaveGroupVideo } from './group/leaveGroupVideo';
 import { onJoinGroupVideo } from './group/joinGroupVideo';
+import { onAcceptCall } from './user/acceptCall';
+import { onSwitchToReceiver } from './webrtc/switchToReceiver';
 
 export const uidSet = new Set(); // 保存在线用户 uid 的集合
 
@@ -99,7 +101,11 @@ export default function setupSocket(server: any) {
 
     onRejectCall(io, socket);
 
+    onAcceptCall(io, socket);
+
     onSwitchToSender(io, socket);
+
+    onSwitchToReceiver(io, socket);
 
     onStartGroupVideo(io, socket);
 

@@ -1,7 +1,8 @@
 /**
- * description: 从接收者转换为发送者
+ * description: 转换为发送者
  * date: 2024-03-02 16:57:10 +0800
  */
+
 import { Socket } from 'socket.io';
 import { socketIdMap } from '..';
 import { UserModel } from '@models/user';
