@@ -3,7 +3,7 @@
  * date: 2024-02-17 11:14:33 +0800
  */
 
-import { ChatType } from '@/enums';
+import { ChatType, ContentType } from '@/enums';
 import { IMessage } from '@/types';
 import { observer } from 'mobx-react-lite';
 import { getUid } from '@/utils/uid';
@@ -22,6 +22,7 @@ function _Bubble({
   chatType,
   avatarUrl,
   name,
+  contentType,
 }: Partial<IMessage> & { chatType: ChatType }) {
   const uid = getUid();
 
@@ -80,7 +81,11 @@ function _Bubble({
           }
         >
           <div className='c-chat_window-chat_area-bubble-content'>
-            {messageContent}
+            {contentType === ContentType.Text ? (
+              messageContent
+            ) : (
+              <img src={messageContent} style={{ maxWidth: 200 }} />
+            )}
           </div>
           <span className='c-chat_window-chat_area-bubble-time'>
             {transformTimestamp(sendTime as string)}

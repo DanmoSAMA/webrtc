@@ -7,11 +7,13 @@ import { MessageType } from '@/enums';
 import { getToken } from '@/utils/token';
 import { socket } from '../../App';
 import { HttpCode } from '../../../../shared/consts/httpCode';
+import { ContentType } from '../../enums/index';
 
 export interface ISendMsg {
   receiver: number;
-  messageContent: string;
+  messageContent: any;
   messageType: MessageType;
+  contentType?: ContentType;
 }
 
 export function sendMsg(reqData: ISendMsg): Promise<any> {
@@ -23,6 +25,7 @@ export function sendMsg(reqData: ISendMsg): Promise<any> {
         receiverUid: reqData.receiver,
         content: reqData.messageContent,
         type: reqData.messageType,
+        contentType: reqData.contentType,
       },
       (code: HttpCode) => {
         resolve({ code, data: null });

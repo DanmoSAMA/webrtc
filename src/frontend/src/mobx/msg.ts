@@ -1,9 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import { MessageType } from '@/enums';
-import { IGroup, IMessage } from '@/types';
+import { IMessage } from '@/types';
 import { pullMsg } from '@/network/message/pullMsg';
 import { getUid } from '@/utils/uid';
-import { getGroupList } from '@/network/group/getGroupList';
 import GroupStore from './group';
 import AuthorityStore from './authority';
 import { isInGroup } from '@/utils/chat';

@@ -1,5 +1,6 @@
 import * as Koa from 'koa';
 import * as KoaBody from 'koa-bodyparser';
+import * as KoaStatic from 'koa-static';
 import * as Cors from '@koa/cors';
 import * as Logger from 'koa-logger';
 import * as https from 'https';
@@ -26,6 +27,8 @@ const app = new Koa();
 //   console.log('No certificate files found!');
 // }
 
+const staticPath = './socket/friend/uploads';
+
 app
   .use(Logger())
   .use(
@@ -41,6 +44,7 @@ app
   )
   .use(handleError())
   .use(KoaBody())
+  .use(KoaStatic(path.join(__dirname, staticPath)))
   .use(router.routes())
   .use(router.allowedMethods());
 

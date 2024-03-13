@@ -9,6 +9,7 @@ import { transformMsg } from '@utils/msg';
 import { UserModel } from '@models/user';
 import { GroupModel } from '@models/group';
 import { FriendshipModel } from '@models/friendship';
+import { ContentType } from './friend/sendMsg';
 
 async function getMaxMid() {
   const startMid = 100000;
@@ -74,7 +75,14 @@ export async function isFriend(senderUid, receiverUid) {
 }
 
 export async function saveMsgToDb(
-  { senderUid, receiver, content, type, gid = null },
+  {
+    senderUid,
+    receiver,
+    content,
+    type,
+    gid = null,
+    contentType = ContentType.Text,
+  },
   isGroup = false,
 ) {
   const mid = await getMaxMid();
@@ -88,6 +96,7 @@ export async function saveMsgToDb(
     type,
     status,
     readUids: [],
+    contentType,
   } as any;
 
   if (!isGroup) {

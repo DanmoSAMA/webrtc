@@ -19,5 +19,6 @@ export async function transformMsg(msg: any) {
     status: msg.status,
     readUids: msg.readUids,
     sender, // 根据开闭原则，只好在后面补上
+    contentType: msg.contentType,
   };
 }

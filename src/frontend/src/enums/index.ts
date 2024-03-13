@@ -51,6 +51,11 @@ export enum MessageType {
   PlaneTicketNotify,
 }
 
+export enum ContentType {
+  Text,
+  Image,
+}
+
 export enum AddType {
   Friend,
   Group,

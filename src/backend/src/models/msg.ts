@@ -51,6 +51,10 @@ const msgSchema = new Schema({
     required: false,
     default: [],
   },
+  contentType: {
+    type: Number,
+    required: false,
+  },
 });
 
 const midSchema = new Schema({

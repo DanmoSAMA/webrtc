@@ -7,11 +7,21 @@ import { isTokenValid, decodeToken } from '@utils/jwt';
 import { Socket } from 'socket.io';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 import { saveMsgToDb } from '../socketUtils';
+import * as path from 'path';
+import * as fs from 'fs';
+
+export enum ContentType {
+  Text,
+  Image,
+}
 
 export function onSendMsg(io: any, socket: Socket) {
   socket.on(
     'send message request',
-    async ({ senderToken, receiverUid, content, type }, callback) => {
+    async (
+      { senderToken, receiverUid, content, type, contentType },
+      callback,
+    ) => {
       let senderUid = '';
       if (isTokenValid(senderToken)) {
         senderUid = decodeToken(senderToken);
@@ -20,18 +30,46 @@ export function onSendMsg(io: any, socket: Socket) {
       }
 
       try {
-        const msg = await saveMsgToDb({
-          senderUid,
-          receiver: receiverUid,
-          content,
-          type,
-        });
+        if (contentType !== ContentType.Image) {
+          const msg = await saveMsgToDb({
+            senderUid,
+            receiver: receiverUid,
+            content,
+            type,
+          });
 
-        io.emit('send message received', msg);
+          io.emit('send message received', msg);
 
-        callback(HttpCode.OK);
+          callback(HttpCode.OK);
+        } else {
+          const { file, filename } = content;
+          const buffer = Buffer.from(file);
+          const filepath = path.join(__dirname, 'uploads', filename);
+
+          fs.writeFile(filepath, buffer, async (err) => {
+            if (err) {
+              callback(HttpCode.SEND_MSG_ERROR);
+              console.log(err);
+            } else {
+              console.log('文件保存成功');
+
+              const msg = await saveMsgToDb({
+                senderUid,
+                receiver: receiverUid,
+                content: 'http://localhost:8080/' + filename,
+                type,
+                contentType,
+              });
+
+              io.emit('send message received', msg);
+
+              callback(HttpCode.OK);
+            }
+          });
+        }
       } catch (err) {
         callback(HttpCode.SEND_MSG_ERROR);
+        console.log(err);
       }
     },
   );

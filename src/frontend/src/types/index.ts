@@ -4,7 +4,7 @@
  * date: 2022-10-31 20:39:10 +0800
  */
 
-import { MessageType } from '@/enums';
+import { ContentType, MessageType } from '@/enums';
 import { MessageStatus } from '../../../shared/enums';
 
 export interface IUser {
@@ -34,6 +34,7 @@ export interface IMessage {
   readUids: any[];
   status: MessageStatus;
   sender: IUser;
+  contentType: ContentType;
 }
 
 export type IMessageOutline = Omit<
