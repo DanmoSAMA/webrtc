@@ -169,6 +169,7 @@ function _ChatWindow() {
               messageId,
               senderId,
               receiverId,
+              contentType,
             }) =>
               (asReceiver(senderId) || asSender(senderId, receiverId)) && (
                 <Bubble
@@ -179,6 +180,7 @@ function _ChatWindow() {
                   senderId={senderId}
                   receiverId={receiverId}
                   chatType={ChatType.Private}
+                  contentType={contentType}
                 />
               ),
           )}
@@ -193,6 +195,7 @@ function _ChatWindow() {
               senderId,
               avatarUrl,
               sender,
+              contentType,
             }) =>
               isThisGroup(groupId) && (
                 <Bubble
@@ -205,6 +208,7 @@ function _ChatWindow() {
                   chatType={ChatType.Group}
                   avatarUrl={avatarUrl}
                   name={sender?.name}
+                  contentType={contentType}
                 />
               ),
           )}

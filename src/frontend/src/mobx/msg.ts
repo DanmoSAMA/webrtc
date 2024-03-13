@@ -44,6 +44,8 @@ class MsgState {
     this.init();
 
     pullMsg().then(({ data }) => {
+      console.log(data);
+
       for (const msg of data.msgs) {
         this.handleMsg(msg.messageType, msg);
       }
@@ -68,6 +70,7 @@ class MsgState {
 
   /* eslint-disable complexity */
   public async handleMsg(msgType: MessageType, msg: any) {
+    console.log(msg, msgType, msgType === MessageType.GroupMessage);
     switch (msgType) {
       case MessageType.FriendRequestNotify: {
         if (msg.receiverId === getUid()) {

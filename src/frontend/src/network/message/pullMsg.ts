@@ -1,6 +1,5 @@
 /**
  * description: 拉取消息
- * author: Yuming Cui
  * date: 2022-11-02 21:10:38 +0800
  */
 

@@ -7,11 +7,14 @@ import { isTokenValid, decodeToken } from '@utils/jwt';
 import { Socket } from 'socket.io';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 import { saveMsgToDb } from '../socketUtils';
+import { ContentType } from '../friend/sendMsg';
+import * as path from 'path';
+import * as fs from 'fs';
 
 export function onSendGroupMsg(io: any, socket: Socket) {
   socket.on(
     'send group message request',
-    async ({ senderToken, gid, content, type }, callback) => {
+    async ({ senderToken, gid, content, type, contentType }, callback) => {
       let senderUid = '';
       if (isTokenValid(senderToken)) {
         senderUid = decodeToken(senderToken);
@@ -21,19 +24,55 @@ export function onSendGroupMsg(io: any, socket: Socket) {
       }
 
       try {
-        const msg = await saveMsgToDb(
-          {
-            senderUid,
-            receiver: gid,
-            content,
-            type,
-          },
-          true,
-        );
+        if (contentType !== ContentType.Image) {
+          const msg = await saveMsgToDb(
+            {
+              senderUid,
+              receiver: gid,
+              content,
+              type,
+            },
+            true,
+          );
 
-        io.emit('send group message received', msg);
+          io.emit('send group message received', msg);
 
-        callback(HttpCode.OK);
+          callback(HttpCode.OK);
+        } else {
+          const { file, filename } = content;
+          const buffer = Buffer.from(file);
+          // const filepath = path.join(__dirname, 'uploads', filename);
+          const filepath = path.join(
+            '/Users/cuiyuming/Public/coding/webrtc/src/backend/src/socket/friend/uploads',
+            filename,
+          );
+
+          fs.writeFile(filepath, buffer, async (err) => {
+            if (err) {
+              callback(HttpCode.SEND_MSG_ERROR);
+              console.log(err);
+            } else {
+              console.log('文件保存成功');
+
+              const msg = await saveMsgToDb(
+                {
+                  senderUid,
+                  receiver: gid,
+                  content: 'http://localhost:8080/' + filename,
+                  type,
+                  contentType,
+                },
+                true,
+              );
+
+              console.log('数据库保存成功');
+
+              io.emit('send group message received', msg);
+
+              callback(HttpCode.OK);
+            }
+          });
+        }
       } catch (err) {
         callback(HttpCode.SEND_MSG_ERROR);
       }

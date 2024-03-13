@@ -3,15 +3,16 @@
  * date: 2022-11-04 17:03:07 +0800
  */
 
-import { MessageType } from '@/enums';
+import { ContentType, MessageType } from '@/enums';
 import { getToken } from '@/utils/token';
 import { socket } from '../../App';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 
 export interface ISendGroupMsg {
   receiver: number;
-  messageContent: string;
+  messageContent: any;
   messageType: MessageType;
+  contentType?: ContentType;
 }
 
 export function sendGroupMsg(reqData: ISendGroupMsg): Promise<any> {
@@ -23,6 +24,7 @@ export function sendGroupMsg(reqData: ISendGroupMsg): Promise<any> {
         gid: reqData.receiver,
         content: reqData.messageContent,
         type: reqData.messageType,
+        contentType: reqData.contentType,
       },
       (code: HttpCode) => {
         resolve({ code, data: null });

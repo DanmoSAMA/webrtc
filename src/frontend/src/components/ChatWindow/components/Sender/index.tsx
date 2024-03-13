@@ -87,25 +87,44 @@ function Sender() {
       reader.onload = async (e) => {
         const fileArrayBuffer = e.target!.result;
 
-        const { code } = await sendMsg({
-          receiver: ChatStore.currentChat?.uid as number,
-          messageContent: {
-            file: fileArrayBuffer,
-            filename: file.name,
-          },
-          messageType: MessageType.SingleMessage,
-          contentType: ContentType.Image,
-        });
-
-        if (code === HttpCode.SEND_MSG_ERROR) {
-          alert.show('发生了未知的错误', {
-            title: '消息发送失败',
+        if (isSingleChat()) {
+          const { code } = await sendMsg({
+            receiver: ChatStore.currentChat?.uid as number,
+            messageContent: {
+              file: fileArrayBuffer,
+              filename: file.name,
+            },
+            messageType: MessageType.SingleMessage,
+            contentType: ContentType.Image,
           });
-          return;
+
+          if (code === HttpCode.SEND_MSG_ERROR) {
+            alert.show('发生了未知的错误', {
+              title: '消息发送失败',
+            });
+            return;
+          }
+        } else {
+          const { code } = await sendGroupMsg({
+            receiver: ChatStore.currentChat?.gid as number,
+            messageContent: {
+              file: fileArrayBuffer,
+              filename: file.name,
+            },
+            messageType: MessageType.GroupMessage,
+            contentType: ContentType.Image,
+          });
+
+          if (code === HttpCode.SEND_MSG_ERROR) {
+            alert.show('发生了未知的错误', {
+              title: '消息发送失败',
+            });
+            return;
+          }
         }
       };
     }
-    // setShowToggle(false);
+    setShowToggle(false);
   }
 
   return (
