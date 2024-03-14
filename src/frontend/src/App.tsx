@@ -10,6 +10,8 @@ import { getPathname } from './utils/url';
 import { rejectCall } from './network/webrtc/rejectCall';
 import { acceptCall } from './network/webrtc/acceptCall';
 import { SingleVideoCall } from './webrtc/single/index';
+import { receiveSendFileReq } from './network/webrtc/receiveSendFile';
+import { FileTransfer } from './webrtc/file';
 import io, { Socket } from 'socket.io-client';
 import Emitter from '@/utils/eventEmitter';
 import MsgStore from '@/mobx/msg';
@@ -93,10 +95,27 @@ function App() {
     MsgStore.initMsg();
 
     fetchUserInfo();
+
+    MultiMediaStore.setStream();
   }, []);
 
   useEffect(() => {
-    MultiMediaStore.setStream();
+    socket.on('send file received', (sender, fileName) => {
+      const checked = confirm(
+        `${sender.name}(${sender.uid}) 正在向给您传输文件 ${fileName}，是否接收？`,
+      );
+
+      if (checked) {
+        const ft = new FileTransfer();
+        ft.handleReceiverSide(sender.uid);
+        receiveSendFileReq({ uid: sender.uid });
+      }
+    });
+
+    socket.on('receive send file received', (sender) => {
+      const ft = new FileTransfer();
+      ft.handleSenderSide(MultiMediaStore.file as File);
+    });
   }, []);
 
   return (

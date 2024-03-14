@@ -9,6 +9,7 @@ import { HttpCode } from '../../../../shared/consts/httpCode';
 
 export interface ISendFile {
   uid: any;
+  fileName: string;
 }
 
 export function sendFileReq(reqData: ISendFile): Promise<any> {
@@ -18,6 +19,7 @@ export function sendFileReq(reqData: ISendFile): Promise<any> {
       {
         senderToken: getToken(),
         receiverUid: reqData.uid,
+        fileName: reqData.fileName,
       },
       (code: HttpCode) => {
         resolve({ code, data: null });

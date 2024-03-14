@@ -12,7 +12,7 @@ import { HttpCode } from '../../../../shared/consts/httpCode';
 export function onSendFile(io: any, socket: Socket) {
   socket.on(
     'send file request',
-    async ({ senderToken, receiverUid }, callback) => {
+    async ({ senderToken, receiverUid, fileName }, callback) => {
       let senderUid;
       if (isTokenValid(senderToken)) {
         senderUid = decodeToken(senderToken);
@@ -21,7 +21,7 @@ export function onSendFile(io: any, socket: Socket) {
       const socketId = socketIdMap.get(receiverUid);
       const sender = await UserModel.findOne({ uid: senderUid });
 
-      socket.to(socketId).emit('send file received', sender);
+      socket.to(socketId).emit('send file received', sender, fileName);
       callback(HttpCode.OK);
     },
   );

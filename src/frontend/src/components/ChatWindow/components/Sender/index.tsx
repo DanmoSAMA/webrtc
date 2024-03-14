@@ -6,17 +6,14 @@ import { HttpCode } from '../../../../../../shared/consts/httpCode';
 import { isSingleChat } from '@/utils/chat';
 import { sendGroupMsg } from '@/network/message/sendGroupMsg';
 import { useShowDropDown } from '@/components/Header/hooks/useShowDropdown';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { transformFileSize } from '@/utils/file';
-import { FileTransfer } from '@/webrtc/file';
 import { sendFileReq } from '@/network/webrtc/sendFile';
-import { socket } from '@/App';
-import { receiveSendFileReq } from '@/network/webrtc/receiveSendFile';
 import ChatStore from '@/mobx/chat';
+import MultiMediaStore from '@/mobx/multiMedia';
 import SvgIcon from '@/components/SvgIcon';
 import Emitter from '@/utils/eventEmitter';
 import './index.scss';
-import MultiMediaStore from '@/mobx/multiMedia';
 
 interface ISendMsg {
   content: string;
@@ -152,25 +149,10 @@ function Sender() {
   async function sendFile() {
     if (file) {
       if (isSingleChat()) {
-        sendFileReq({ uid: ChatStore.currentChat!.uid });
+        sendFileReq({ uid: ChatStore.currentChat!.uid, fileName: file.name });
       }
     }
   }
-
-  useEffect(() => {
-    socket.on('send file received', (sender) => {
-      receiveSendFileReq({ uid: sender.uid });
-      const ft = new FileTransfer();
-      ft.handleReceiverSide(sender.uid);
-    });
-  }, []);
-
-  useEffect(() => {
-    socket.on('receive send file received', (sender) => {
-      const ft = new FileTransfer();
-      ft.handleSenderSide(MultiMediaStore.file);
-    });
-  }, []);
 
   return (
     <>
