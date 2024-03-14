@@ -6,14 +6,25 @@ import { HttpCode } from '../../../../../../shared/consts/httpCode';
 import { isSingleChat } from '@/utils/chat';
 import { sendGroupMsg } from '@/network/message/sendGroupMsg';
 import { useShowDropDown } from '@/components/Header/hooks/useShowDropdown';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { transformFileSize } from '@/utils/file';
+import { FileTransfer } from '@/webrtc/file';
+import { sendFileReq } from '@/network/webrtc/sendFile';
+import { socket } from '@/App';
+import { receiveSendFileReq } from '@/network/webrtc/receiveSendFile';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Emitter from '@/utils/eventEmitter';
 import './index.scss';
+import MultiMediaStore from '@/mobx/multiMedia';
 
 interface ISendMsg {
   content: string;
+}
+
+enum ToggleType {
+  Image,
+  File,
 }
 
 function Sender() {
@@ -22,6 +33,7 @@ function Sender() {
   const { showDropDown, setShowDropDown } = useShowDropDown();
   const [showToggle, setShowToggle] = useState(false);
   const [file, setFile] = useState<File | null>();
+  const [toggleType, setToggleType] = useState(ToggleType.Image);
 
   async function onSubmit({ content }: ISendMsg) {
     reset();
@@ -65,6 +77,7 @@ function Sender() {
 
   async function onUploadImage(e: any) {
     setShowToggle(true);
+    setToggleType(ToggleType.Image);
     const file = e.target.files[0];
     setTimeout(() => {
       const selectedImage: any = document.querySelector('#selectedImage');
@@ -77,6 +90,15 @@ function Sender() {
       reader.readAsDataURL(file);
       setFile(file);
     });
+  }
+
+  async function onUploadFile(e: any) {
+    setShowToggle(true);
+    setToggleType(ToggleType.File);
+
+    const file = e.target.files[0];
+    setFile(file);
+    MultiMediaStore.file = file; // 在下面的 socket 回调里面打印 file 总是 undefined，所以出此下策
   }
 
   async function sendImg() {
@@ -126,6 +148,29 @@ function Sender() {
     }
     setShowToggle(false);
   }
+
+  async function sendFile() {
+    if (file) {
+      if (isSingleChat()) {
+        sendFileReq({ uid: ChatStore.currentChat!.uid });
+      }
+    }
+  }
+
+  useEffect(() => {
+    socket.on('send file received', (sender) => {
+      receiveSendFileReq({ uid: sender.uid });
+      const ft = new FileTransfer();
+      ft.handleReceiverSide(sender.uid);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on('receive send file received', (sender) => {
+      const ft = new FileTransfer();
+      ft.handleSenderSide(MultiMediaStore.file);
+    });
+  }, []);
 
   return (
     <>
@@ -185,8 +230,8 @@ function Sender() {
             <input
               className='c-chat_window-sender-dropdown-item-uploader'
               type='file'
-              accept='image/gif, image/jpeg, image/png, image/jpg'
-              // onChange={upload}
+              accept='.pdf, .doc, .docx, .zip, .ppt, .pptx'
+              onChange={onUploadFile}
             />
           </div>
         </div>
@@ -218,8 +263,13 @@ function Sender() {
       {showToggle && (
         <div>
           <div className='c-chat_window-sender-mask'></div>
-          <div className='c-chat_window-sender-toggle'>
-            <h2 className='c-chat_window-sender-toggle-title'>Send Photo</h2>
+          <div
+            className='c-chat_window-sender-toggle'
+            style={{ height: toggleType === ToggleType.Image ? '60%' : '30%' }}
+          >
+            <h2 className='c-chat_window-sender-toggle-title'>
+              {toggleType === ToggleType.Image ? 'Send Photo' : 'Send File'}
+            </h2>
             <SvgIcon
               name='cross'
               style={{
@@ -236,13 +286,36 @@ function Sender() {
               }}
               onClick={() => setShowToggle(false)}
             />
-            <img
-              id='selectedImage'
-              src='#'
-              alt='selectedImage'
-              className='c-chat_window-sender-toggle-img'
-            />
-            <div className='c-chat_window-sender-toggle-send' onClick={sendImg}>
+            {toggleType === ToggleType.Image ? (
+              <img
+                id='selectedImage'
+                src='#'
+                alt='selectedImage'
+                className='c-chat_window-sender-toggle-img'
+              />
+            ) : (
+              <div className='c-chat_window-sender-toggle-file'>
+                <SvgIcon
+                  name='file'
+                  style={{
+                    width: '35px',
+                    height: '35px',
+                    color: 'var(--global-font-primary_lighter)',
+                    margin: '0 15px 0 0',
+                  }}
+                />
+                <div className='c-chat_window-sender-toggle-file-content'>
+                  <span style={{ height: 30 }}>{file!.name}</span>
+                  <span style={{ fontSize: 12 }}>
+                    {transformFileSize(file!.size)}
+                  </span>
+                </div>
+              </div>
+            )}
+            <div
+              className='c-chat_window-sender-toggle-send'
+              onClick={toggleType === ToggleType.Image ? sendImg : sendFile}
+            >
               SEND
             </div>
           </div>

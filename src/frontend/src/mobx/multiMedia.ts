@@ -17,6 +17,7 @@ class MultiMediaState {
   // @ts-ignore
   public stream: MediaStream;
   public svc: SingleVideoCall;
+  public file: File | null = null;
 
   public constructor() {
     makeAutoObservable(this);
