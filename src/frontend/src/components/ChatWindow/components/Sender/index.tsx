@@ -148,9 +148,36 @@ function Sender() {
 
   async function sendFile() {
     if (file) {
-      if (isSingleChat()) {
-        sendFileReq({ uid: ChatStore.currentChat!.uid, fileName: file.name });
-      }
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+
+      reader.onload = async (e) => {
+        const fileArrayBuffer = e.target!.result;
+
+        if (isSingleChat()) {
+          sendFileReq({
+            uid: ChatStore.currentChat!.uid,
+            fileName: file.name,
+          });
+        } else {
+          const { code } = await sendGroupMsg({
+            receiver: ChatStore.currentChat?.gid as number,
+            messageContent: {
+              file: fileArrayBuffer,
+              filename: file.name,
+            },
+            messageType: MessageType.GroupMessage,
+            contentType: ContentType.File,
+          });
+
+          if (code === HttpCode.SEND_MSG_ERROR) {
+            alert.show('发生了未知的错误', {
+              title: '消息发送失败',
+            });
+            return;
+          }
+        }
+      };
     }
   }
 
@@ -280,14 +307,14 @@ function Sender() {
                 <SvgIcon
                   name='file'
                   style={{
-                    width: '35px',
+                    minWidth: '35px',
                     height: '35px',
                     color: 'var(--global-font-primary_lighter)',
                     margin: '0 15px 0 0',
                   }}
                 />
                 <div className='c-chat_window-sender-toggle-file-content'>
-                  <span style={{ height: 30 }}>{file!.name}</span>
+                  <span>{file!.name}</span>
                   <span style={{ fontSize: 12 }}>
                     {transformFileSize(file!.size)}
                   </span>

@@ -56,7 +56,7 @@ export function onJoinGroup(io: any, socket: Socket) {
 
         callback(HttpCode.OK);
       } catch (err) {
-        console.log('🐮', err);
+        console.log(err);
         callback(HttpCode.JOIN_GROUP_ERROR);
       }
     },

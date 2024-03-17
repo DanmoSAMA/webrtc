@@ -22,8 +22,6 @@ export class GroupVideoCall {
 
   setListener() {
     socket.on('sdp offer received', (offer, sender) => {
-      // console.log('🐮', this.pc.remoteDescription, sender);
-
       if (this.pc.remoteDescription !== null) {
         return;
       }

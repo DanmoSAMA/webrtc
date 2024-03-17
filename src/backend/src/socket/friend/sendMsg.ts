@@ -13,6 +13,7 @@ import * as fs from 'fs';
 export enum ContentType {
   Text,
   Image,
+  File,
 }
 
 export function onSendMsg(io: any, socket: Socket) {

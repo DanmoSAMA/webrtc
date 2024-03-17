@@ -116,6 +116,10 @@ function App() {
       const ft = new FileTransfer();
       ft.handleSenderSide(MultiMediaStore.file as File);
     });
+
+    socket.on('send file group received', (sender, fileName) => {
+      //
+    });
   }, []);
 
   return (

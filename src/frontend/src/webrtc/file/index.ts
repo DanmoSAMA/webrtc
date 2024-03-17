@@ -5,7 +5,7 @@
 
 import { socket } from '@/App';
 import { getToken } from '@/utils/token';
-import { sendFileByChunk } from '@/utils/file';
+import { handleDownload, sendFileByChunk } from '@/utils/file';
 import ChatStore from '@/mobx/chat';
 
 export class FileTransfer {
@@ -207,15 +207,7 @@ export class FileTransfer {
           const receivedBlob = new Blob(receivedBuffers, { type: fileType });
           // 创建链接指向 Blob
           const blobUrl = URL.createObjectURL(receivedBlob);
-          const downloadAnchor = document.createElement('a');
-          downloadAnchor.href = blobUrl;
-          downloadAnchor.download = fileName;
-          document.body.appendChild(downloadAnchor);
-          downloadAnchor.click();
-
-          document.body.removeChild(downloadAnchor);
-          // 结束使用某个 URL 对象之后，应该让浏览器知道，不用在内存中继续保留对这个文件的引用
-          URL.revokeObjectURL(blobUrl);
+          handleDownload(blobUrl, fileName);
         } else if (receivedSize > fileSize) {
           console.error('Received more bytes than expected.');
         }

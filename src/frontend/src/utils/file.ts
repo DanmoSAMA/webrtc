@@ -20,8 +20,6 @@ export const chunkSize = 16384; // 16KB
 
 // 分块发送文件
 export function sendFileByChunk(dataChannel: RTCDataChannel, file: File) {
-  console.log(file);
-
   const fileReader = new FileReader();
   let offset = 0;
 
@@ -38,4 +36,17 @@ export function sendFileByChunk(dataChannel: RTCDataChannel, file: File) {
     }
   };
   readSlice(0);
+}
+
+export function handleDownload(blobUrl: string, fileName: string) {
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.style.display = 'none';
+  downloadAnchor.href = blobUrl;
+  downloadAnchor.download = fileName;
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+
+  document.body.removeChild(downloadAnchor);
+  // 结束使用某个 URL 对象之后，应该让浏览器知道，不用在内存中继续保留对这个文件的引用
+  URL.revokeObjectURL(blobUrl);
 }

@@ -7,6 +7,7 @@ import { Middleware } from 'koa';
 import { SECRET_KEY } from '@consts/index';
 import * as jwt from 'jsonwebtoken';
 
+// 暂时没使用，未来的重构点
 const verifyToken: Middleware = (ctx, next) => {
   const authHeader = ctx.header.authorization;
 

@@ -12,6 +12,7 @@ import { asSender, isMsgRead, isSingleChat } from '@/utils/chat';
 import { DefaultAvatarUrl } from '@/consts';
 import SvgIcon from '@/components/SvgIcon';
 import './index.scss';
+import { downloadFile } from '@/network/message/downloadFile';
 
 function _Bubble({
   sendTime,
@@ -81,10 +82,33 @@ function _Bubble({
           }
         >
           <div className='c-chat_window-chat_area-bubble-content'>
-            {contentType === ContentType.Text ? (
-              messageContent
-            ) : (
+            {contentType === ContentType.Text && messageContent}
+            {contentType === ContentType.Image && (
               <img src={messageContent} style={{ maxWidth: 200 }} />
+            )}
+            {contentType === ContentType.File && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: 'var(--global-font-secondary)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  downloadFile({ filename: messageContent as string });
+                }}
+              >
+                <SvgIcon
+                  name='file'
+                  style={{
+                    minWidth: '30px',
+                    height: '30px',
+                    color: 'var(--global-font-primary_lighter)',
+                    margin: '0 5px 0 0',
+                  }}
+                />
+                <span>{messageContent}</span>
+              </div>
             )}
           </div>
           <span className='c-chat_window-chat_area-bubble-time'>

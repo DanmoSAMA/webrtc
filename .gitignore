@@ -1,2 +1,3 @@
 node_modules
 
+src/backend/src/socket/friend/uploads/*

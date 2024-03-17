@@ -54,6 +54,7 @@ export enum MessageType {
 export enum ContentType {
   Text,
   Image,
+  File,
 }
 
 export enum AddType {
