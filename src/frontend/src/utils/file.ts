@@ -3,6 +3,8 @@
  * date: 2024-03-13 21:15:19 +0800
  */
 
+import { v4 as uuidv4 } from 'uuid';
+
 export function transformFileSize(byteSize: number) {
   if (byteSize < Math.pow(2, 10)) {
     return byteSize + 'B';
@@ -49,4 +51,10 @@ export function handleDownload(blobUrl: string, fileName: string) {
   document.body.removeChild(downloadAnchor);
   // 结束使用某个 URL 对象之后，应该让浏览器知道，不用在内存中继续保留对这个文件的引用
   URL.revokeObjectURL(blobUrl);
+}
+
+export function generateRandomFileName(extension: string) {
+  const uuid = uuidv4();
+  const filename = `file-${uuid}.${extension}`;
+  return filename;
 }

@@ -14,6 +14,7 @@ export enum ContentType {
   Text,
   Image,
   File,
+  Audio,
 }
 
 export function onSendMsg(io: any, socket: Socket) {
@@ -31,7 +32,7 @@ export function onSendMsg(io: any, socket: Socket) {
       }
 
       try {
-        if (contentType !== ContentType.Image) {
+        if (contentType === ContentType.Text) {
           const msg = await saveMsgToDb({
             senderUid,
             receiver: receiverUid,

@@ -42,6 +42,7 @@ specifiers:
   sass: ^1.49.9
   socket.io-client: ^4.7.4
   typescript: ^4.6.4
+  uuid: ^9.0.1
   vite: ^3.1.0
   vite-plugin-mkcert: ^1.17.3
 
@@ -66,6 +67,7 @@ dependencies:
   react-router: 6.4.2_react@18.2.0
   react-router-dom: 6.4.2_biqbaboplfbrettd7655fr4n2y
   socket.io-client: 4.7.4
+  uuid: 9.0.1
 
 devDependencies:
   '@emotion/eslint-plugin': 11.10.0_eslint@8.26.0
@@ -3596,6 +3598,11 @@ packages:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
       punycode: 2.1.1
+
+  /uuid/9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
+    dev: false
 
   /vite-plugin-mkcert/1.17.3_vite@3.1.8:
     resolution: {integrity: sha512-C8iLz4Su4kEyJb1GdlGIMfKkYMqfH5qvhqVP1x/hrc+1mo9GOzqU88mevvP5epgoqawkhVpcQVQ+HTFXsRuC0g==}

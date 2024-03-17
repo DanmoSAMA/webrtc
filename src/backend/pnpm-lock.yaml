@@ -16,6 +16,7 @@ specifiers:
   sha256: ^0.2.0
   socket.io: ^4.7.4
   tsconfig-paths: ^4.2.0
+  uuid: ^9.0.1
 
 dependencies:
   '@koa/cors': 3.4.3
@@ -30,6 +31,7 @@ dependencies:
   mongoose: 6.12.6
   sha256: 0.2.0
   socket.io: 4.7.4
+  uuid: 9.0.1
 
 devDependencies:
   nodemon: 2.0.22
@@ -3032,6 +3034,11 @@ packages:
     hasBin: true
     dev: false
     optional: true
+
+  /uuid/9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
+    dev: false
 
   /vary/1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}

@@ -55,6 +55,7 @@ export enum ContentType {
   Text,
   Image,
   File,
+  Audio,
 }
 
 export enum AddType {

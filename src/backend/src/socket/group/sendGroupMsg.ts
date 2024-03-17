@@ -54,7 +54,10 @@ export function onSendGroupMsg(io: any, socket: Socket) {
 
                 let msg;
 
-                if (contentType === ContentType.Image) {
+                if (
+                  contentType === ContentType.Image ||
+                  contentType === ContentType.Audio
+                ) {
                   msg = await saveMsgToDb(
                     {
                       senderUid,

@@ -110,6 +110,9 @@ function _Bubble({
                 <span>{messageContent}</span>
               </div>
             )}
+            {contentType === ContentType.Audio && (
+              <audio src={messageContent} controls></audio>
+            )}
           </div>
           <span className='c-chat_window-chat_area-bubble-time'>
             {transformTimestamp(sendTime as string)}

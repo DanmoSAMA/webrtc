@@ -6,8 +6,8 @@ import { HttpCode } from '../../../../../../shared/consts/httpCode';
 import { isSingleChat } from '@/utils/chat';
 import { sendGroupMsg } from '@/network/message/sendGroupMsg';
 import { useShowDropDown } from '@/components/Header/hooks/useShowDropdown';
-import { useState } from 'react';
-import { transformFileSize } from '@/utils/file';
+import { useEffect, useState } from 'react';
+import { generateRandomFileName, transformFileSize } from '@/utils/file';
 import { sendFileReq } from '@/network/webrtc/sendFile';
 import ChatStore from '@/mobx/chat';
 import MultiMediaStore from '@/mobx/multiMedia';
@@ -22,6 +22,7 @@ interface ISendMsg {
 enum ToggleType {
   Image,
   File,
+  Audio,
 }
 
 function Sender() {
@@ -29,8 +30,18 @@ function Sender() {
   const { register, reset, handleSubmit } = useForm<ISendMsg>();
   const { showDropDown, setShowDropDown } = useShowDropDown();
   const [showToggle, setShowToggle] = useState(false);
+  const [showMask, setShowMask] = useState(false);
+  const [isRecordComplete, setIsRecordComplete] = useState(false);
+  const [isStartRecord, setIsStartRecord] = useState(false);
   const [file, setFile] = useState<File | null>();
   const [toggleType, setToggleType] = useState(ToggleType.Image);
+  const [timeText, setTimeText] = useState('');
+  const [recordingInterval, setRecordingInterval] = useState<any>();
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
+  const [audioBlob, setAudioBlob] = useState<Blob>();
+  const [audioUrl, setAudioUrl] = useState('');
+
+  let startTime: any;
 
   async function onSubmit({ content }: ISendMsg) {
     reset();
@@ -45,6 +56,7 @@ function Sender() {
           receiver: ChatStore.currentChat.uid as number,
           messageContent: content,
           messageType: MessageType.SingleMessage,
+          contentType: ContentType.Text,
         });
 
         if (code === HttpCode.SEND_MSG_ERROR) {
@@ -58,6 +70,7 @@ function Sender() {
           receiver: ChatStore.currentChat.gid as number,
           messageContent: content,
           messageType: MessageType.GroupMessage,
+          contentType: ContentType.Text,
         });
 
         if (code === HttpCode.SEND_MSG_ERROR) {
@@ -75,7 +88,10 @@ function Sender() {
   async function onUploadImage(e: any) {
     setShowToggle(true);
     setToggleType(ToggleType.Image);
+    setShowMask(true);
+
     const file = e.target.files[0];
+
     setTimeout(() => {
       const selectedImage: any = document.querySelector('#selectedImage');
       const reader = new FileReader();
@@ -86,12 +102,13 @@ function Sender() {
 
       reader.readAsDataURL(file);
       setFile(file);
-    });
+    }, 0);
   }
 
   async function onUploadFile(e: any) {
     setShowToggle(true);
     setToggleType(ToggleType.File);
+    setShowMask(true);
 
     const file = e.target.files[0];
     setFile(file);
@@ -143,7 +160,10 @@ function Sender() {
         }
       };
     }
+    Emitter.emit('scrollToBottom');
+
     setShowToggle(false);
+    setShowMask(false);
   }
 
   async function sendFile() {
@@ -179,7 +199,122 @@ function Sender() {
         }
       };
     }
+    Emitter.emit('scrollToBottom');
+
+    setShowToggle(false);
+    setShowMask(false);
   }
+
+  async function sendAudio() {
+    if (audioBlob) {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(audioBlob);
+
+      reader.onload = async (e) => {
+        const fileArrayBuffer = e.target!.result;
+        const filename = generateRandomFileName('mp3');
+
+        if (isSingleChat()) {
+          const { code } = await sendMsg({
+            receiver: ChatStore.currentChat?.uid as number,
+            messageContent: {
+              file: fileArrayBuffer,
+              filename: filename,
+            },
+            messageType: MessageType.SingleMessage,
+            contentType: ContentType.Audio,
+          });
+
+          if (code === HttpCode.SEND_MSG_ERROR) {
+            alert.show('发生了未知的错误', {
+              title: '消息发送失败',
+            });
+            return;
+          }
+        } else {
+          const { code } = await sendGroupMsg({
+            receiver: ChatStore.currentChat?.gid as number,
+            messageContent: {
+              file: fileArrayBuffer,
+              filename: filename,
+            },
+            messageType: MessageType.GroupMessage,
+            contentType: ContentType.Audio,
+          });
+
+          if (code === HttpCode.SEND_MSG_ERROR) {
+            alert.show('发生了未知的错误', {
+              title: '消息发送失败',
+            });
+            return;
+          }
+        }
+      };
+    }
+    Emitter.emit('scrollToBottom');
+
+    setShowToggle(false);
+    setShowMask(false);
+  }
+
+  const updateRecordingTime = () => {
+    const elapsedTime = Date.now() - startTime;
+    const ms = (elapsedTime % 100).toString().padStart(2, '0');
+    const seconds = Math.floor((elapsedTime / 1000) % 60)
+      .toString()
+      .padStart(2, '0');
+    const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60)
+      .toString()
+      .padStart(2, '0');
+    setTimeText(`${minutes}:${seconds}:${ms}`);
+  };
+
+  function handleStartRecord() {
+    setIsStartRecord(true);
+    startTime = Date.now();
+    const interval = setInterval(updateRecordingTime, 16);
+    setRecordingInterval(interval);
+
+    mediaRecorder!.start();
+  }
+
+  function handleStopRecord() {
+    setIsRecordComplete(true);
+    clearInterval(recordingInterval);
+
+    mediaRecorder!.stop();
+  }
+
+  useEffect(() => {
+    if (MultiMediaStore.stream) {
+      setMediaRecorder(new MediaRecorder(MultiMediaStore.stream));
+    }
+  }, [MultiMediaStore.stream]);
+
+  useEffect(() => {
+    const chunks: Blob[] = [];
+    let url = '';
+
+    if (mediaRecorder) {
+      mediaRecorder.ondataavailable = (e) => {
+        chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(chunks);
+        chunks.length = 0;
+
+        url = URL.createObjectURL(audioBlob);
+
+        setAudioBlob(audioBlob);
+        setAudioUrl(url);
+      };
+    }
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [mediaRecorder]);
 
   return (
     <>
@@ -244,7 +379,6 @@ function Sender() {
             />
           </div>
         </div>
-
         <form
           className='c-chat_window-sender-form'
           onSubmit={handleSubmit(onSubmit)}
@@ -257,7 +391,16 @@ function Sender() {
             {...register('content', { required: true })}
           />
         </form>
-        <div style={{ marginRight: '20px' }}>
+        <div
+          style={{ marginRight: '20px' }}
+          onClick={() => {
+            if (ChatStore.currentChat !== null) {
+              setShowToggle(true);
+              setToggleType(ToggleType.Audio);
+              setShowMask(true);
+            }
+          }}
+        >
           <SvgIcon
             name='microphone'
             style={{
@@ -269,15 +412,17 @@ function Sender() {
           />
         </div>
       </div>
+      {showMask && <div className='c-chat_window-mask'></div>}
       {showToggle && (
         <div>
-          <div className='c-chat_window-sender-mask'></div>
           <div
             className='c-chat_window-sender-toggle'
             style={{ height: toggleType === ToggleType.Image ? '60%' : '30%' }}
           >
             <h2 className='c-chat_window-sender-toggle-title'>
-              {toggleType === ToggleType.Image ? 'Send Photo' : 'Send File'}
+              {toggleType === ToggleType.Image && 'Send Photo'}
+              {toggleType === ToggleType.File && 'Send File'}
+              {toggleType === ToggleType.Audio && 'Record Audio'}
             </h2>
             <SvgIcon
               name='cross'
@@ -293,16 +438,24 @@ function Sender() {
                   color: 'var(--global-font-primary)',
                 },
               }}
-              onClick={() => setShowToggle(false)}
+              onClick={() => {
+                setShowToggle(false);
+                setShowMask(false);
+                setIsStartRecord(false);
+                setIsRecordComplete(false);
+                setTimeText('');
+                setAudioUrl('');
+              }}
             />
-            {toggleType === ToggleType.Image ? (
+            {toggleType === ToggleType.Image && (
               <img
                 id='selectedImage'
                 src='#'
                 alt='selectedImage'
                 className='c-chat_window-sender-toggle-img'
               />
-            ) : (
+            )}
+            {toggleType === ToggleType.File && (
               <div className='c-chat_window-sender-toggle-file'>
                 <SvgIcon
                   name='file'
@@ -321,12 +474,46 @@ function Sender() {
                 </div>
               </div>
             )}
-            <div
-              className='c-chat_window-sender-toggle-send'
-              onClick={toggleType === ToggleType.Image ? sendImg : sendFile}
-            >
-              SEND
-            </div>
+            {toggleType === ToggleType.Audio && (
+              <div className='c-chat_window-sender-toggle-time'>{timeText}</div>
+            )}
+            {toggleType === ToggleType.Audio && !isStartRecord && (
+              <div
+                className='c-chat_window-sender-toggle-start'
+                onClick={handleStartRecord}
+              >
+                Start Record
+              </div>
+            )}
+            {toggleType === ToggleType.Audio &&
+              isStartRecord &&
+              !isRecordComplete && (
+                <div
+                  className='c-chat_window-sender-toggle-stop'
+                  onClick={handleStopRecord}
+                >
+                  Stop
+                </div>
+              )}
+            {toggleType === ToggleType.Audio && isRecordComplete && (
+              <audio src={audioUrl} controls></audio>
+            )}
+            {toggleType !== ToggleType.Audio && (
+              <div
+                className='c-chat_window-sender-toggle-send'
+                onClick={toggleType === ToggleType.Image ? sendImg : sendFile}
+              >
+                SEND
+              </div>
+            )}
+            {toggleType === ToggleType.Audio && isRecordComplete && (
+              <div
+                className='c-chat_window-sender-toggle-send'
+                onClick={sendAudio}
+              >
+                SEND
+              </div>
+            )}
           </div>
         </div>
       )}
