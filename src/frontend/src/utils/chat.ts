@@ -6,6 +6,7 @@ import { getGroupList } from '@/network/group/getGroupList';
 import { IGroup } from '@/types';
 import { getUid } from './uid';
 import ChatStore from '@/mobx/chat';
+import ChatListStore from '@/mobx/chatlist';
 
 // 是否单聊
 export function isSingleChat() {
@@ -45,10 +46,6 @@ export function isThisGroup(gid: any) {
 
 // 是否在群里
 export async function isInGroup(gid: any) {
-  const {
-    data: { groups },
-  } = await getGroupList();
-
-  const gids = groups.map((group: IGroup) => group.gid);
+  const gids = ChatListStore.groupData.map((group: IGroup) => group.gid);
   return gids.includes(gid);
 }
