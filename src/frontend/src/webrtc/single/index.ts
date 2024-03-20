@@ -1,6 +1,6 @@
 import { socket } from '@/App';
 import { getToken } from '@/utils/token';
-import { terminateCall } from '@/network/webrtc/terminateCall';
+import { terminateCall } from '@/network/friend/terminateCall';
 import ChatStore from '@/mobx/chat';
 
 export class SingleVideoCall {

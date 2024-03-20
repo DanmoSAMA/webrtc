@@ -5,9 +5,9 @@
 
 import { socket } from '@/App';
 import { getToken } from '@/utils/token';
-import { terminateCall } from '@/network/webrtc/terminateCall';
+import { terminateCall } from '@/network/friend/terminateCall';
 import ChatStore from '@/mobx/chat';
-import { terminateDesktopShare } from '@/network/webrtc/terminateDesktopShare';
+import { terminateDesktopShare } from '@/network/friend/terminateDesktopShare';
 
 export class DesktopShare {
   pc: RTCPeerConnection;

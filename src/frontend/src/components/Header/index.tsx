@@ -1,12 +1,12 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useShowDropDown } from './hooks/useShowDropdown';
-import { call } from '@/network/webrtc/call';
+import { call } from '@/network/friend/call';
 import { useAlert } from 'react-alert';
 import { isOnline, isSingleChat } from '@/utils/chat';
 import { startGroupVideo } from '@/network/group/startGroupVideo';
 import { getUid } from '@/utils/uid';
-import { shareDesktop } from '@/network/webrtc/shareDesktop';
+import { shareDesktop } from '@/network/friend/shareDesktop';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Search from './components/Search';

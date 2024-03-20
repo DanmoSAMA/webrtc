@@ -8,7 +8,7 @@ import { sendGroupMsg } from '@/network/message/sendGroupMsg';
 import { useShowDropDown } from '@/components/Header/hooks/useShowDropdown';
 import { useEffect, useState } from 'react';
 import { generateRandomFileName, transformFileSize } from '@/utils/file';
-import { sendFileReq } from '@/network/webrtc/sendFile';
+import { sendFileReq } from '@/network/friend/sendFile';
 import ChatStore from '@/mobx/chat';
 import MultiMediaStore from '@/mobx/multiMedia';
 import SvgIcon from '@/components/SvgIcon';

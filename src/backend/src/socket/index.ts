@@ -23,22 +23,22 @@ import { onLogout } from './user/logout';
 import { onSdpOffer } from './webrtc/sdpOffer';
 import { onSdpAnswer } from './webrtc/sdpAnswer';
 import { onIceCandidate } from './webrtc/iceCandidate';
-import { onCall } from './user/call';
-import { onTerminateCall } from './user/terminateCall';
-import { onRejectCall } from './user/rejectCall';
+import { onCall } from './friend/call';
+import { onTerminateCall } from './friend/terminateCall';
+import { onRejectCall } from './friend/rejectCall';
 import { onSwitchToSender } from './webrtc/switchToSender';
 import { onStartGroupVideo } from './group/startGroupVideo';
 import { onLeaveGroupVideo } from './group/leaveGroupVideo';
 import { onJoinGroupVideo } from './group/joinGroupVideo';
-import { onAcceptCall } from './user/acceptCall';
+import { onAcceptCall } from './friend/acceptCall';
 import { onSwitchToReceiver } from './webrtc/switchToReceiver';
 import { onReconnect } from './group/reconnect';
-import { onSendFile } from './user/sendFile';
-import { onReceiveSendFile } from './user/receiveSendFile';
-import { onShareDesktop } from './user/shareDesktop';
-import { onAcceptShareDesktop } from './user/acceptShareDesktop';
-import { onRejectShareDesktop } from './user/rejectShareDesktop';
-import { onTerminateDesktopShare } from './user/terminateDesktopShare';
+import { onSendFile } from './friend/sendFile';
+import { onReceiveSendFile } from './friend/receiveSendFile';
+import { onShareDesktop } from './friend/shareDesktop';
+import { onAcceptShareDesktop } from './friend/acceptShareDesktop';
+import { onRejectShareDesktop } from './friend/rejectShareDesktop';
+import { onTerminateDesktopShare } from './friend/terminateDesktopShare';
 
 export const uidSet = new Set(); // 保存在线用户 uid 的集合
 
