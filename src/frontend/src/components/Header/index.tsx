@@ -6,13 +6,14 @@ import { useAlert } from 'react-alert';
 import { isOnline, isSingleChat } from '@/utils/chat';
 import { startGroupVideo } from '@/network/group/startGroupVideo';
 import { getUid } from '@/utils/uid';
+import { shareDesktop } from '@/network/webrtc/shareDesktop';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
 import Search from './components/Search';
 import LeftDropdown from './components/LeftDropdown';
 import RightDropdown from './components/RightDropdown';
 import QueryDropdown from './components/QueryDropdown';
-import MultiMediaStore from '@/mobx/multiMedia';
+import MultiMediaStore, { MultiMediaType } from '@/mobx/multiMedia';
 import GroupStore from '@/mobx/group';
 import './index.scss';
 
@@ -25,25 +26,10 @@ function _Header() {
   const [showQueryDropdown, setShowQueryDropdown] = useState(false);
   const alert = useAlert();
 
-  // function handleAudioChat() {
-  //   if (isSingleChat()) {
-  //     if (isOnline()) {
-  //       ChatStore.setIsMultiMedia(true);
-  //       MultiMediaStore.setAudioOpenState(true);
-  //       MultiMediaStore.setVideoOpenState(false);
-
-  //       call({ uid: ChatStore.currentChat?.uid });
-  //     } else {
-  //       alert.show('对方处于离线状态，请稍后再试', {
-  //         title: '操作失败 ',
-  //       });
-  //     }
-  //   }
-  // }
-
   async function handleVideoChat() {
     MultiMediaStore.setAudioOpenState(true);
     MultiMediaStore.setVideoOpenState(true);
+    MultiMediaStore.type = MultiMediaType.VoiceCall;
 
     if (isSingleChat()) {
       if (isOnline()) {
@@ -66,6 +52,17 @@ function _Header() {
       } else {
         alert.show('请加入已经创建好的语音通话');
       }
+    }
+  }
+
+  async function handleShareDesktop() {
+    if (isOnline()) {
+      await MultiMediaStore.setDisplayStream();
+      shareDesktop({ uid: ChatStore.currentChat?.uid });
+    } else {
+      alert.show('对方处于离线状态，请稍后再试', {
+        title: '操作失败 ',
+      });
     }
   }
 
@@ -106,6 +103,20 @@ function _Header() {
             </span>
           )}
         </div>
+        {ChatStore.currentChat?.uid && (
+          <SvgIcon
+            name='remoteControl'
+            style={{
+              color: 'var(--global-font-primary_lighter)',
+              width: '30px',
+              height: '30px',
+              position: 'absolute',
+              right: '210px',
+              cursor: 'pointer',
+            }}
+            onClick={handleShareDesktop}
+          />
+        )}
         {ChatStore.currentChat && (
           <SvgIcon
             name='phone'
@@ -114,38 +125,10 @@ function _Header() {
               width: '33px',
               height: '33px',
               position: 'absolute',
-              right: '210px',
-              cursor: 'pointer',
-            }}
-            onClick={handleVideoChat}
-          />
-        )}
-        {/* {ChatStore.currentChat && (
-          <SvgIcon
-            name='video'
-            style={{
-              color: 'var(--global-font-primary_lighter)',
-              width: '30px',
-              height: '30px',
-              position: 'absolute',
-              right: '210px',
-              cursor: 'pointer',
-            }}
-            onClick={handleVideoChat}
-          />
-        )} */}
-        {ChatStore.currentChat && (
-          <SvgIcon
-            name='remoteControl'
-            style={{
-              color: 'var(--global-font-primary_lighter)',
-              width: '30px',
-              height: '30px',
-              position: 'absolute',
               right: '140px',
               cursor: 'pointer',
             }}
-            // onClick={(e) => {}}
+            onClick={handleVideoChat}
           />
         )}
         {ChatStore.currentChat && (

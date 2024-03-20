@@ -1,19 +1,21 @@
 /**
- * description: 结束视频/语音通话
- * date: 2024-02-21 23:07:08 +0800
+ * description: 结束桌面共享
+ * date: 2024-03-20 22:01:29 +0800
  */
 
 import { socket } from '../../App';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 
-export interface ITerminateCall {
+export interface ITerminateDesktopShare {
   uid: any;
 }
 
-export function terminateCall(reqData: ITerminateCall): Promise<any> {
+export function terminateDesktopShare(
+  reqData: ITerminateDesktopShare,
+): Promise<any> {
   return new Promise((resolve) => {
     socket.emit(
-      'terminate call request',
+      'terminate desktop share request',
       {
         receiverUid: reqData.uid,
       },

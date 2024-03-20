@@ -6,12 +6,20 @@
 import { isSingleChat } from '@/utils/chat';
 import MultiMediaSingle from './components/Single';
 import MultiMediaGroup from './components/Group';
+import MultiMediaStore, { MultiMediaType } from '@/mobx/multiMedia';
+import Desktop from './components/Desktop';
 import './index.scss';
 
 function MultiMedia() {
   return (
     <div className='c-multimedia'>
-      {isSingleChat() ? <MultiMediaSingle /> : <MultiMediaGroup />}
+      {MultiMediaStore.type === MultiMediaType.VoiceCall && isSingleChat() && (
+        <MultiMediaSingle />
+      )}
+      {MultiMediaStore.type === MultiMediaType.VoiceCall && !isSingleChat() && (
+        <MultiMediaGroup />
+      )}
+      {MultiMediaStore.type === MultiMediaType.ShareDesktop && <Desktop />}
     </div>
   );
 }

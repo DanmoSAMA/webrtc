@@ -1,11 +1,17 @@
+/**
+ * description: 桌面共享
+ * date: 2024-03-20 09:00:31 +0800
+ */
+
 import { socket } from '@/App';
 import { getToken } from '@/utils/token';
 import { terminateCall } from '@/network/webrtc/terminateCall';
 import ChatStore from '@/mobx/chat';
+import { terminateDesktopShare } from '@/network/webrtc/terminateDesktopShare';
 
-export class SingleVideoCall {
+export class DesktopShare {
   pc: RTCPeerConnection;
-  stream: MediaStream;
+  stream?: MediaStream;
 
   constructor(_stream: MediaStream) {
     this.pc = new RTCPeerConnection();
@@ -15,8 +21,8 @@ export class SingleVideoCall {
   handleSenderSide() {
     console.log('sender: add track');
 
-    this.stream.getTracks().forEach((track) => {
-      this.pc.addTrack(track, this.stream);
+    this.stream!.getTracks().forEach((track) => {
+      this.pc.addTrack(track, this.stream!);
     });
 
     this.pc.onnegotiationneeded = () => {
@@ -94,29 +100,9 @@ export class SingleVideoCall {
         this.pc.restartIce();
       }
     };
-
-    this.pc.ontrack = (e) => {
-      console.log('sender ontrack');
-
-      const oppositeSideMediaElement = document.querySelector(
-        'video#oppositeSide',
-      ) as HTMLMediaElement;
-
-      oppositeSideMediaElement.srcObject = e.streams[0];
-
-      oppositeSideMediaElement.onloadedmetadata = () => {
-        oppositeSideMediaElement.play();
-      };
-    };
   }
 
   handleReceiverSide(senderUid: any) {
-    console.log('receiver: add track');
-
-    this.stream.getTracks().forEach((track) => {
-      this.pc.addTrack(track, this.stream);
-    });
-
     this.pc.onicecandidate = function (event) {
       if (event.candidate) {
         console.log('receiver: send ice candidate');
@@ -186,31 +172,23 @@ export class SingleVideoCall {
       console.log('receiver ontrack');
 
       setTimeout(() => {
-        const oppositeSideMediaElement = document.querySelector(
-          'video#oppositeSide',
+        const videoElement = document.querySelector(
+          'video#desktop_video',
         ) as HTMLMediaElement;
-
-        oppositeSideMediaElement.srcObject = e.streams[0];
-
-        oppositeSideMediaElement.onloadedmetadata = () => {
-          oppositeSideMediaElement.play();
+        videoElement.srcObject = e.streams[0];
+        videoElement.onloadedmetadata = () => {
+          videoElement.play();
         };
       }, 100);
     };
   }
 
-  stopConnection(isSender = true) {
-    this.pc.getSenders().forEach((sender) => {
-      this.pc.removeTrack(sender);
-    });
-
+  stopConnection() {
     this.pc.close();
 
-    ChatStore.setIsMultiMedia(false);
-
     // 向对方发送终止通话的通知
-    if (isSender) {
-      terminateCall({ uid: ChatStore.currentChat?.uid });
-    }
+    terminateDesktopShare({ uid: ChatStore.currentChat?.uid });
+
+    ChatStore.setIsMultiMedia(false);
   }
 }

@@ -35,6 +35,10 @@ import { onSwitchToReceiver } from './webrtc/switchToReceiver';
 import { onReconnect } from './group/reconnect';
 import { onSendFile } from './user/sendFile';
 import { onReceiveSendFile } from './user/receiveSendFile';
+import { onShareDesktop } from './user/shareDesktop';
+import { onAcceptShareDesktop } from './user/acceptShareDesktop';
+import { onRejectShareDesktop } from './user/rejectShareDesktop';
+import { onTerminateDesktopShare } from './user/terminateDesktopShare';
 
 export const uidSet = new Set(); // 保存在线用户 uid 的集合
 
@@ -121,5 +125,13 @@ export default function setupSocket(server: any) {
     onSendFile(io, socket);
 
     onReceiveSendFile(io, socket);
+
+    onShareDesktop(io, socket);
+
+    onAcceptShareDesktop(io, socket);
+
+    onRejectShareDesktop(io, socket);
+
+    onTerminateDesktopShare(io, socket);
   });
 }

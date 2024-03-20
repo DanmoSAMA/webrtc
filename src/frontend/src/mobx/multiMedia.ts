@@ -7,6 +7,12 @@ import { makeAutoObservable } from 'mobx';
 import { IUser } from '@/types';
 import { SingleVideoCall } from '@/webrtc/single';
 import ChatStore from './chat';
+import { DesktopShare } from '@/webrtc/desktop';
+
+export enum MultiMediaType {
+  VoiceCall,
+  ShareDesktop,
+}
 
 class MultiMediaState {
   public isAudioOpen = true;
@@ -14,10 +20,12 @@ class MultiMediaState {
   public isSender = true;
   public sender: IUser | null = null;
   public memberList: IUser[] = [];
-  // @ts-ignore
   public stream: MediaStream;
+  public displayStream: MediaStream;
   public svc: SingleVideoCall;
   public file: File | null = null;
+  public type: MultiMediaType = MultiMediaType.VoiceCall;
+  public ds: DesktopShare;
 
   public constructor() {
     makeAutoObservable(this);
@@ -111,6 +119,29 @@ class MultiMediaState {
 
           MultiMediaStore.stream = _stream;
 
+          resolve();
+        })
+        .catch((error) => {
+          console.log('获取媒体流失败: ', error);
+          reject(error);
+        });
+    });
+  }
+
+  /**
+   * 设置 display stream
+   * @param void
+   * @returns void
+   */
+  public setDisplayStream(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      navigator.mediaDevices
+        .getDisplayMedia({
+          video: true,
+          audio: false,
+        })
+        .then((_stream) => {
+          MultiMediaStore.displayStream = _stream;
           resolve();
         })
         .catch((error) => {
