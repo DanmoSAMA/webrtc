@@ -26,6 +26,8 @@ import './index.scss';
 async function handleJoinVideoChat() {
   ChatStore.setIsMultiMedia(true);
 
+  await MultiMediaStore.setStream();
+
   const { data: memberList } = await joinGroupVideo({
     gid: GroupStore.gid,
   });

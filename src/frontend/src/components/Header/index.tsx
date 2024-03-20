@@ -27,6 +27,7 @@ function _Header() {
   const alert = useAlert();
 
   async function handleVideoChat() {
+    await MultiMediaStore.setStream();
     MultiMediaStore.setAudioOpenState(true);
     MultiMediaStore.setVideoOpenState(true);
     MultiMediaStore.type = MultiMediaType.VoiceCall;

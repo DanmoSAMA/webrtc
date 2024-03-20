@@ -2,7 +2,7 @@
  * description: Chat 相关的工具函数
  * date: 2024-02-14 13:46:52 +0800
  */
-import { getGroupList } from '@/network/group/getGroupList';
+
 import { IGroup } from '@/types';
 import { getUid } from './uid';
 import ChatStore from '@/mobx/chat';

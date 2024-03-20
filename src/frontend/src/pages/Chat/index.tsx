@@ -77,7 +77,7 @@ function _Chat() {
   useEffect(() => {
     const pathname = getPathname(window.location.href);
 
-    socket.on('call received', (sender) => {
+    socket.on('call received', async (sender) => {
       if (pathname !== 'login' && pathname !== 'register') {
         const checked = confirm(`收到用户 ${sender.name} 的语音通话请求`);
 
@@ -88,6 +88,7 @@ function _Chat() {
             MultiMediaStore.isAudioOpen,
             MultiMediaStore.isVideoOpen,
           );
+          await MultiMediaStore.setStream();
           const svc = new SingleVideoCall(MultiMediaStore.stream);
           MultiMediaStore.svc = svc;
           svc.handleReceiverSide(sender.uid);
@@ -139,7 +140,7 @@ function _Chat() {
     socket.on('terminate desktop share received ', () => {
       MultiMediaStore.ds.stopConnection();
 
-      alert.show('对方已结束通话', {
+      alert.show('对方已结束共享', {
         onClose: () => {
           location.reload();
         },
@@ -149,8 +150,8 @@ function _Chat() {
 
   useEffect(() => {
     MsgStore.initMsg();
+
     fetchUserInfo();
-    MultiMediaStore.setStream();
   }, []);
 
   useEffect(() => {
