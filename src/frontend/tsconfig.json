@@ -40,9 +40,9 @@
       "@/network/*": ["src/network/*"],
       "@/consts/*": ["src/consts/*"],
       "@/plugins/*": ["src/plugins/*"],
-      "@/types/*": ["src/types"],
-      "@/enums/*": ["src/enums"],
-      "@/webrtc/*": ["src/webrtc"]
+      "@/types/*": ["src/types/*"],
+      "@/enums/*": ["src/enums/*"],
+      "@/webrtc/*": ["src/webrtc/*"]
     }
   },
   "include": ["src", "tests"],

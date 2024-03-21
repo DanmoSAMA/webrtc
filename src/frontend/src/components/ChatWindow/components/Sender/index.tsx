@@ -286,10 +286,12 @@ function Sender() {
   }
 
   useEffect(() => {
-    if (MultiMediaStore.stream) {
-      setMediaRecorder(new MediaRecorder(MultiMediaStore.stream));
+    if (toggleType === ToggleType.Audio) {
+      MultiMediaStore.setStream().then(() => {
+        setMediaRecorder(new MediaRecorder(MultiMediaStore.stream));
+      });
     }
-  }, [MultiMediaStore.stream]);
+  }, [toggleType]);
 
   useEffect(() => {
     const chunks: Blob[] = [];

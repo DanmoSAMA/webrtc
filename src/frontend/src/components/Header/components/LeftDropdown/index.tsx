@@ -1,10 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import { CSSObject } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
 import { Theme, ToggleType } from '@/enums';
-import { MessageStatus } from '../../../../../../shared/enums/index';
 import { logout } from '@/network/user/logout';
-import MsgStore from '@/mobx/msg';
+import { useGoto, useMsgCount } from './hook';
 import UserStore from '@/mobx/user';
 import ToggleStore from '@/mobx/toggle';
 import SvgIcon from '@/components/SvgIcon';
@@ -34,10 +32,8 @@ function _LeftDropdown({
   showLeftDropdown,
   setShowLeftDropdown,
 }: LeftDropdownProps) {
-  const navigate = useNavigate();
-  const msgCount = [...MsgStore.friendRequest, ...MsgStore.groupNotify].filter(
-    (msg) => msg.status === MessageStatus.Unhandled,
-  ).length;
+  const { gotoPrivate, gotoGroup } = useGoto();
+  const { msgCount } = useMsgCount();
 
   return (
     <ul
@@ -48,7 +44,7 @@ function _LeftDropdown({
         className='c-header-left-dropdown-item'
         onClick={() => {
           setShowLeftDropdown(false);
-          navigate('/private');
+          gotoPrivate();
         }}
       >
         <SvgIcon name='contact' style={iconStyle} />
@@ -58,7 +54,7 @@ function _LeftDropdown({
         className='c-header-left-dropdown-item'
         onClick={() => {
           setShowLeftDropdown(false);
-          navigate('/group');
+          gotoGroup();
         }}
       >
         <SvgIcon name='group' style={iconStyle} />

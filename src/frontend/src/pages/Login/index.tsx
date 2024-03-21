@@ -3,20 +3,13 @@
  * date: 2024-02-07 21:08:01 +0800
  */
 
+import { IRegister } from '@/network/user/register';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useAlert } from 'react-alert';
-import { sha256 } from 'js-sha256';
 import { Theme } from '@/enums';
-import {
-  IRegister,
-  register as postRegisterReq,
-} from '@/network/user/register';
-import { ILogin, login as postLoginReq } from '@/network/user/login';
+import { ILogin } from '@/network/user/login';
 import ThemeStore from '@/mobx/theme';
-import { setToken } from '@/utils/token';
-import { setUid } from '@/utils/uid';
-import { HttpCode } from '../../../../shared/consts/httpCode';
+import { useLoginSubmit } from './hook';
 import './index.scss';
 
 function Login() {
@@ -29,63 +22,7 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
-  const alert = useAlert();
-
-  const onSubmit = async (reqData: any) => {
-    if (pathname === '/login') {
-      reqData.password = sha256(reqData.password);
-      reqData.uid = parseInt(reqData.uid, 10);
-      const { code, data } = await postLoginReq(reqData);
-
-      if (!data) {
-        switch (code) {
-          case HttpCode.INCORRECT_PASSWD:
-            alert.show('密码错误！', {
-              title: '登录失败',
-            });
-            break;
-          case HttpCode.USER_NOT_EXIST:
-            alert.show('用户不存在！', {
-              title: '登录失败',
-            });
-            break;
-        }
-        return;
-      }
-      const { token } = data;
-      // 设置 token
-      setToken(token);
-      // 设置 uid
-      setUid(reqData.uid);
-      alert.show('登录成功', {
-        onClose: () => {
-          navigate('/private');
-        },
-      });
-    } else {
-      const { code, data } = await postRegisterReq(reqData);
-      // 注册失败
-      if (!data) {
-        switch (code) {
-          case HttpCode.USER_HAS_EXISTED:
-            alert.show('该用户已注册！', {
-              title: '注册失败',
-            });
-            break;
-        }
-        return;
-      }
-      const { uid } = data;
-      alert.show(`您的 uid 为 ${uid}，请及时保存！`, {
-        timeout: 60000,
-        title: '注册成功',
-        onClose: () => {
-          reset();
-          navigate('/login');
-        },
-      });
-    }
-  };
+  const { onSubmit } = useLoginSubmit(pathname, reset);
 
   return (
     <div

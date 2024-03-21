@@ -4,12 +4,12 @@ import { MessageType, ChatType } from '@/enums';
 import { getIdentity } from '@/network/group/getIdentity';
 import { useAlert } from 'react-alert';
 import { getGroupVideoChatMembers } from '@/network/group/getGroupVideoChatMembers';
+import { HttpCode } from '../../../../../../shared/consts/httpCode';
 import ChatStore from '@/mobx/chat';
 import AuthorityStore from '@/mobx/authority';
 import GroupStore from '@/mobx/group';
 import MultiMediaStore from '@/mobx/multiMedia';
 import './index.scss';
-import { HttpCode } from '../../../../../../shared/consts/httpCode';
 
 function _ListItem({
   uid,

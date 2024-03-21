@@ -9,7 +9,7 @@ import { getUid } from '@/utils/uid';
 import { shareDesktop } from '@/network/friend/shareDesktop';
 import ChatStore from '@/mobx/chat';
 import SvgIcon from '@/components/SvgIcon';
-import Search from './components/Search';
+// import Search from './components/Search';
 import LeftDropdown from './components/LeftDropdown';
 import RightDropdown from './components/RightDropdown';
 import QueryDropdown from './components/QueryDropdown';
@@ -87,7 +87,7 @@ function _Header() {
           showLeftDropdown={showLeftDropdown}
           setShowLeftDropdown={setShowLeftDropdown}
         />
-        <Search />
+        {/* <Search /> */}
       </div>
       <div className='c-header-right'>
         <div className='c-header-right-info'>

@@ -5,16 +5,14 @@
 
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
-import { useAlert } from 'react-alert';
 import { useState, useEffect } from 'react';
-import { ToggleType, MessageType, AddType, NotifyType } from '@/enums';
+import { ToggleType, AddType, NotifyType } from '@/enums';
 import { IMessageContent } from '@/types';
-import { ICreateGroup, createGroup } from '@/network/group/createGroup';
-import { IAddFriend, addFriend } from '@/network/friend/addFriend';
+import { ICreateGroup } from '@/network/group/createGroup';
+import { IAddFriend } from '@/network/friend/addFriend';
 import { socket } from '@/App';
 import { getUid } from '@/utils/uid';
-import { joinGroup } from '@/network/group/joinGroup';
-import { HttpCode } from '../../../../shared/consts/httpCode';
+import { useReqSubmit } from './hook';
 import ToggleStore from '@/mobx/toggle';
 import ChatListStore from '@/mobx/chatlist';
 import MsgStore from '@/mobx/msg';
@@ -31,13 +29,15 @@ function _Toggle() {
     formState: { errors },
   } = useForm<Partial<IMessageContent & ICreateGroup & IAddFriend>>();
 
-  const alert = useAlert();
   // 添加好友/群
   const [addType, setAddType] = useState<AddType>(AddType.Friend);
   // 好友请求/群通知
   const [notifyType, setNotifyType] = useState<NotifyType>(
     NotifyType.friendRequest,
   );
+
+  const { onAddContactSubmit, onJoinGroupSubmit, onCreateGroupSubmit } =
+    useReqSubmit(reset);
 
   const sortedGroupMsgs = [
     ...MsgStore.groupNotify,
@@ -97,87 +97,6 @@ function _Toggle() {
       ChatListStore.updateFriend();
     });
   }, []);
-
-  async function onAddContactSubmit(reqData: any) {
-    reqData.messageType = MessageType.FriendRequestNotify;
-    reqData.receiver = parseInt(reqData.receiver, 10);
-    if (reqData.receiver === getUid()) {
-      alert.show('不能添加自己为好友', {
-        onClose: () => {
-          reset();
-        },
-      });
-      return;
-    }
-
-    const { code } = await addFriend(reqData);
-
-    if (code === HttpCode.USER_NOT_EXIST) {
-      alert.show('用户不存在');
-      return;
-    } else if (code === HttpCode.REQ_HAS_EXISTED) {
-      alert.show('已向对方发起过请求，请耐心等待');
-      return;
-    } else if (code === HttpCode.HAS_BEEN_FRIEND) {
-      alert.show('你们已经是好友了');
-      return;
-    }
-
-    alert.show('已发送添加好友请求', {
-      onClose: async () => {
-        ToggleStore.setShowToggle(false);
-        reset();
-      },
-    });
-  }
-
-  async function onJoinGroupSubmit(reqData: any) {
-    reqData.messageType = MessageType.JoinGroupRequestNotify;
-    reqData.receiver = parseInt(reqData.receiver, 10); // gid
-
-    const { code } = await joinGroup(reqData);
-
-    if (code === HttpCode.GROUP_NOT_EXIST) {
-      alert.show('该群不存在');
-      return;
-    } else if (code === HttpCode.REQ_HAS_EXISTED) {
-      alert.show('已发起过入群请求，请耐心等待');
-      return;
-    } else if (code === HttpCode.HAS_JOINED_GROUP) {
-      alert.show('您已经是该群的成员');
-      return;
-    }
-
-    alert.show('已发送入群申请', {
-      onClose: async () => {
-        ToggleStore.setShowToggle(false);
-        reset();
-      },
-    });
-  }
-
-  async function onCreateGroupSubmit(reqData: any) {
-    const { code } = await createGroup(reqData);
-
-    switch (code) {
-      case HttpCode.GROUP_HAS_EXISTED:
-        alert.show('该群名称已存在', {
-          title: '创建群失败',
-          onClose: () => {
-            reset();
-          },
-        });
-        return;
-    }
-
-    alert.show('创建群聊成功', {
-      onClose: async () => {
-        await ChatListStore.updateGroup();
-        ToggleStore.setShowToggle(false);
-        reset();
-      },
-    });
-  }
 
   return (
     <div

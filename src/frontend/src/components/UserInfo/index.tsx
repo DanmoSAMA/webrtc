@@ -1,16 +1,18 @@
 import { observer } from 'mobx-react-lite';
 import { DefaultAvatarUrl } from '@/consts';
-import UserStore from '@/mobx/user';
-import SvgIcon from '../SvgIcon';
 import { useAlert } from 'react-alert';
 import { ModifyUserAvatar } from '@/network/user/modifyUserAvatar';
+import UserStore from '@/mobx/user';
+import SvgIcon from '../SvgIcon';
 import './index.scss';
 
 function _UserInfo() {
   const alert = useAlert();
+
   function upload(e: any) {
     const formData: FormData = new FormData();
     formData.append('file', e.target.files[0]);
+
     fetch('/api/upload', {
       method: 'POST',
       body: formData,

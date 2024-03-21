@@ -32,8 +32,8 @@ import './index.scss';
 
 function _Chat() {
   const _location = useLocation();
-  const { pathname } = _location;
   const alert = useAlert();
+  const { pathname } = _location;
 
   async function fetchUserInfo() {
     const { data } = await getUserInfo();

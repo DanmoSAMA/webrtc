@@ -5,12 +5,8 @@
 
 import { observer } from 'mobx-react-lite';
 import { AuthorityLevel } from '@/enums';
-import { setAdmin, cancelAdmin } from '@/network/group/setAdmin';
-import { givePlaneTicket } from '@/network/group/givePlaneTicket';
-import { useAlert } from 'react-alert';
-import { HttpCode } from '../../../../../../../../shared/consts/httpCode';
+import { useGroupOperation } from './hook';
 import AuthorityStore from '@/mobx/authority';
-import GroupStore from '@/mobx/group';
 import './index.scss';
 
 interface ListItemProps {
@@ -30,7 +26,7 @@ function _ListItem({
   gid,
   online,
 }: ListItemProps) {
-  const alert = useAlert();
+  const { handleSetAdmin, handleCancelAdmin } = useGroupOperation(uid, gid);
 
   return (
     <div
@@ -57,19 +53,7 @@ function _ListItem({
           identity === AuthorityLevel.Member && (
             <div
               className='c-header-query-dropdown-list-item-main-btn'
-              onClick={async () => {
-                const { code } = await setAdmin({ uid, gid });
-
-                if (code === HttpCode.SET_ADMIN_ERROR) {
-                  alert.show('操作失败');
-                } else {
-                  alert.show('已设置管理员', {
-                    onClose: async () => {
-                      GroupStore.init(gid);
-                    },
-                  });
-                }
-              }}
+              onClick={handleSetAdmin}
             >
               设为管理
             </div>
@@ -78,19 +62,7 @@ function _ListItem({
           identity === AuthorityLevel.Administrator && (
             <div
               className='c-header-query-dropdown-list-item-main-btn'
-              onClick={async () => {
-                const { code } = await cancelAdmin({ uid, gid });
-
-                if (code === HttpCode.SET_ADMIN_ERROR) {
-                  alert.show('操作失败');
-                } else {
-                  alert.show('已取消管理员', {
-                    onClose: async () => {
-                      GroupStore.init(gid);
-                    },
-                  });
-                }
-              }}
+              onClick={handleCancelAdmin}
             >
               移除管理
             </div>
@@ -109,23 +81,12 @@ function _ListItem({
 }
 
 function PlaneTicket({ uid, gid }: any) {
-  const alert = useAlert();
+  const { handleGivePlaneTicket } = useGroupOperation(uid, gid);
+
   return (
     <div
       className='c-header-query-dropdown-list-item-main-btn'
-      onClick={async () => {
-        const { code } = await givePlaneTicket({ uid, gid });
-
-        if (code === HttpCode.SET_ADMIN_ERROR) {
-          alert.show('操作失败');
-        } else {
-          alert.show('已踢出群', {
-            onClose: async () => {
-              GroupStore.init(gid);
-            },
-          });
-        }
-      }}
+      onClick={handleGivePlaneTicket}
     >
       移出群聊
     </div>
