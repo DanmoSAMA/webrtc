@@ -54,7 +54,8 @@ export const groupVideoChatRooms = [];
 export default function setupSocket(server: any) {
   const io = new Server(server, {
     cors: {
-      origin: 'https://localhost:5173',
+      // origin: 'https://localhost:5173',
+      origin: 'https://webrtc.danmoits.com',
     },
   });
 

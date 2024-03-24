@@ -17,7 +17,8 @@
       "@models/*": ["./src/models/*"],
       "@router/*": ["./src/router/*"],
       "@utils/*": ["./src/utils/*"],
-      "@consts/*": ["./src/consts/*"]
+      "@consts/*": ["./src/consts/*"],
+      "@socket/*": ["./src/socket/*"]
     }
   },
   "exclude": ["node_modules"]

@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon",
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc && tsc-alias"
   },
   "dependencies": {
     "@koa/cors": "^3.3.0",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "nodemon": "^2.0.15",
     "pm2": "^5.2.0",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0"
   }
 }

@@ -9,7 +9,7 @@ import { isTokenValid } from '@utils/jwt';
 import { SECRET_KEY } from '@consts/index';
 import { FriendshipModel } from '@models/friendship';
 import { UserModel } from '@models/user';
-import { checkOnline } from 'src/socket';
+import { checkOnline } from '../../../src/socket';
 import * as jwt from 'jsonwebtoken';
 
 export const getFriendList: Middleware = async (ctx) => {

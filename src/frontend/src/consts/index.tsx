@@ -3,7 +3,7 @@
  * date: 2022-10-29 21:11:03 +0800
  */
 
-// export const BackendHost = 'http://api.danmoits.com'
+// export const BackendHost = 'https://api.danmoits.com';
 
 export const BackendHost = 'http://localhost:8080';
 

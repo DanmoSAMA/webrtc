@@ -6,4 +6,4 @@
 
 前端: React + Mobx + Sass + TypeScript
 
-后端:
+后端: Koa2 + TypeScript + Mongoose

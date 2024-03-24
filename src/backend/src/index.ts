@@ -11,6 +11,7 @@ import { setupMongo } from './models';
 import handleError from './middleware/handleError';
 import router from './router/index';
 import setupSocket from './socket';
+import { UPLOAD_PATH } from './consts';
 
 setupMongo();
 
@@ -27,7 +28,7 @@ const app = new Koa();
 //   console.log('No certificate files found!');
 // }
 
-const staticPath = './socket/friend/uploads';
+// const staticPath = './socket/friend/uploads';
 
 app
   .use(Logger())
@@ -44,7 +45,7 @@ app
   )
   .use(handleError())
   .use(KoaBody())
-  .use(KoaStatic(path.join(__dirname, staticPath)))
+  .use(KoaStatic(path.join(__dirname, UPLOAD_PATH)))
   .use(router.routes())
   .use(router.allowedMethods());
 

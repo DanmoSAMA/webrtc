@@ -8,7 +8,7 @@ import { HttpCode } from '../../../../shared/consts/httpCode';
 import { isTokenValid } from '@utils/jwt';
 import { GroupModel } from '@models/group';
 import { UserModel } from '@models/user';
-import { checkOnline } from 'src/socket';
+import { checkOnline } from '../../../src/socket';
 
 export const getGroupInfo: Middleware = async (ctx) => {
   const reqBody = ctx.request.body;

@@ -6,7 +6,7 @@
 import { Middleware } from 'koa';
 import { HttpCode } from '../../../../shared/consts/httpCode';
 import { isTokenValid } from '@utils/jwt';
-import { groupVideoChatRooms } from 'src/socket';
+import { groupVideoChatRooms } from '../../../src/socket';
 
 export const getGroupVideoChatMembers: Middleware = async (ctx) => {
   const reqBody = ctx.request.body;
